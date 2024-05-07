@@ -79,36 +79,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             child: CircularProgressIndicator(),
                           ),
                       ),
-                      // DisplayListOfProjects(
-                      //   projects: const [
-                      //     Project(
-                      //         id: 1,
-                      //         title: 'Geto Mobile Project',
-                      //         description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
-                      //     ),
-                      //     Project(
-                      //       id: 2,
-                      //         title: 'Geto Web Project',
-                      //         description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
-                      //     ),
-                      //     Project(
-                      //         id: 3,
-                      //         title: 'Geto Web Project',
-                      //         description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
-                      //     ),
-                      //     Project(
-                      //         id: 4,
-                      //         title: 'Geto Web Project',
-                      //         description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
-                      //     ),
-                      //     Project(
-                      //         id: 5,
-                      //         title: 'Geto Web Project',
-                      //         description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
-                      //     ),
-                      //   ],
-                      //   ref: ref,
-                      // ),
                       const Gap(20),
                       ElevatedButton(
                           onPressed: () => context.push(RouteLocation.createProject),
