@@ -8,13 +8,25 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   static HomeScreen builder(BuildContext context, GoRouterState state)
     => const HomeScreen();
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // final futureRef = projectProvider.
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.colorScheme;
     final deviceSize = context.deviceSize;
 
@@ -53,50 +65,50 @@ class HomeScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // projects.when(
-                      //     data: (projects) {
-                      //       List<Project> projectsList = projects.map((e) => e).toList();
-                      //       return DisplayListOfProjects(
-                      //         projects: projectsList,
-                      //         ref: ref,
-                      //       );
-                      //     },
-                      //   //TODO: snakBar here
-                      //     error: (error,s) => Text(error.toString()),
-                      //     loading: () =>  const Center(
-                      //       child: CircularProgressIndicator(),
-                      //     ),
-                      // ),
-                      DisplayListOfProjects(
-                        projects: const [
-                          Project(
-                              id: 1,
-                              title: 'Geto Mobile Project',
-                              description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+                      projects.when(
+                          data: (projects) {
+                            List<Project> projectsList = projects.map((e) => e).toList();
+                            return DisplayListOfProjects(
+                              projects: projectsList,
+                              ref: ref,
+                            );
+                          },
+                        //TODO: snakBar here
+                          error: (error,s) => Text(error.toString()),
+                          loading: () =>  const Center(
+                            child: CircularProgressIndicator(),
                           ),
-                          Project(
-                            id: 2,
-                              title: 'Geto Web Project',
-                              description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
-                          ),
-                          Project(
-                              id: 3,
-                              title: 'Geto Web Project',
-                              description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
-                          ),
-                          Project(
-                              id: 4,
-                              title: 'Geto Web Project',
-                              description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
-                          ),
-                          Project(
-                              id: 5,
-                              title: 'Geto Web Project',
-                              description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
-                          ),
-                        ],
-                        ref: ref,
                       ),
+                      // DisplayListOfProjects(
+                      //   projects: const [
+                      //     Project(
+                      //         id: 1,
+                      //         title: 'Geto Mobile Project',
+                      //         description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+                      //     ),
+                      //     Project(
+                      //       id: 2,
+                      //         title: 'Geto Web Project',
+                      //         description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+                      //     ),
+                      //     Project(
+                      //         id: 3,
+                      //         title: 'Geto Web Project',
+                      //         description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+                      //     ),
+                      //     Project(
+                      //         id: 4,
+                      //         title: 'Geto Web Project',
+                      //         description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+                      //     ),
+                      //     Project(
+                      //         id: 5,
+                      //         title: 'Geto Web Project',
+                      //         description: "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
+                      //     ),
+                      //   ],
+                      //   ref: ref,
+                      // ),
                       const Gap(20),
                       ElevatedButton(
                           onPressed: () => context.push(RouteLocation.createProject),
