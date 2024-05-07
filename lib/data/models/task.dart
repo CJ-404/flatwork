@@ -2,10 +2,11 @@ import 'package:equatable/equatable.dart';
 import 'package:flatwork/data/models/user.dart';
 
 class Task extends Equatable {
-  final int? id;
+  final String? id;
   final String title;
   final String description;
-  final List<User> assignedTeamMembers;
+  final User? assignedUser;
+  // final List<User> assignedTeamMembers;
   final bool isCompleted;
   // final String time;
   // final String date;
@@ -14,18 +15,27 @@ class Task extends Equatable {
     this.id,
     required this.title,
     required this.description,
-    required this.assignedTeamMembers,
+    // required this.assignedTeamMembers,
+    this.assignedUser,
     required this.isCompleted,
     // required this.time,
     // required this.date
   });
 
   factory Task.fromJson(Map<String, dynamic> json){
+    // print(json['name'] == "null null");
+    // print(json['user_Id'] == null);
+    User? assigned = (json['name'] == "null null" || json['user_Id'] == null)?
+    null
+        :
+    User(id: json['user_Id'] ,firstName: json['name'], lastName: "", email: "");
+
     return Task(
-      id: json['id'],
-      title: json['task_name'],
-      description: json['task_description'],
-      assignedTeamMembers: json['teamMembers'],
+      id: json['task_Id'],
+      title: json['task_Name'],
+      description: json['task_Description'],
+      assignedUser: assigned,
+      // assignedTeamMembers: const [],//json['teamMembers'],
       isCompleted: false,
     );
   }
@@ -46,6 +56,8 @@ class Task extends Equatable {
       id!,
       title,
       description,
+      assignedUser,
+      // assignedTeamMembers,
       isCompleted,
       // time,
       // date,
