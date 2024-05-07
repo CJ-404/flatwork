@@ -1,7 +1,5 @@
 import 'package:flatwork/data/data.dart';
-import 'package:flatwork/services/api_services.dart';
 import 'package:flatwork/utils/utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 

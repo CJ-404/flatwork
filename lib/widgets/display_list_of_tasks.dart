@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../config/routes/routes.dart';
 import '../data/data.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gap/gap.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DisplayListOfTasks extends StatelessWidget {
@@ -21,7 +20,7 @@ class DisplayListOfTasks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deviceSize = context.deviceSize;
-    const emptyTasksMessage = "There is no task yet";
+    const emptyTasksMessage = "There are no tasks yet";
 
     return CommonContainer(
       height: deviceSize.height*0.68,

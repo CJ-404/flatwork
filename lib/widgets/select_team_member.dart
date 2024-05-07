@@ -1,21 +1,18 @@
-import 'package:flatwork/utils/utils.dart';
-import 'package:flatwork/widgets/user_tile.dart';
 import 'package:flatwork/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import '../config/routes/routes.dart';
 import '../data/data.dart';
-import 'package:go_router/go_router.dart';
-import 'package:gap/gap.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flatwork/providers/providers.dart';
 
 class SelectTeamMember extends ConsumerStatefulWidget {
   const SelectTeamMember({
     super.key,
-    required this.assignedMembers
+    required this.assignedMembers,
+    required this.scaffoldKey,
   });
 
   final List<User> assignedMembers;
+  final GlobalKey<ScaffoldState> scaffoldKey;
 
   @override
   ConsumerState<SelectTeamMember> createState() => _SelectTeamMemberState();
@@ -41,61 +38,10 @@ class _SelectTeamMemberState extends ConsumerState<SelectTeamMember> {
   @override
   Widget build(BuildContext context) {
     //TODO: fetch all users from the backend
-    // final users = ref.watch(usersProvider);
-    final users = [
-      User(
-          id: 1,
-          firstName: 'kasuns',
-          lastName: 'gajanayaka',
-          email: 'kasunGaje@gmail.com',
-          contact: '0781232345'
-      ),
-      User(
-          id: 2,
-          firstName: 'kassdfun',
-          lastName: 'gajanayaka',
-          email: 'kasunGaje@gmail.com',
-          contact: '0781232345'
-      ),
-      User(
-          id: 3,
-          firstName: 'kasun',
-          lastName: 'gajasfdsnayaka',
-          email: 'kasunGaje@gmail.com',
-          contact: '0781232345'
-      ),
-      User(
-          id: 4,
-          firstName: 'kasun',
-          lastName: 'gajanayaka',
-          email: 'kasunGasdaje@gmail.com',
-          contact: '0781232345'
-      ),
-      User(
-          id: 4,
-          firstName: 'kasun',
-          lastName: 'gajanayaka',
-          email: 'kasunGaje@gmail.com',
-          contact: '0781232345'
-      ),
-      User(
-          id: 4,
-          firstName: 'kasun',
-          lastName: 'gajanayaka',
-          email: 'kasunGaje@gmail.com',
-          contact: '0781232345'
-      ),
-      User(
-          id: 4,
-          firstName: 'kasun',
-          lastName: 'gajanayaka',
-          email: 'kasunGaje@gmail.com',
-          contact: '0781232345'
-      ),
-    ];
+    final fetchedUsers = ref.watch(usersProvider);
 
     final userFilter = ref.watch(userFilterProvider);
-    final TextEditingController filterController = TextEditingController();
+    // final TextEditingController filterController = TextEditingController();
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -121,18 +67,28 @@ class _SelectTeamMemberState extends ConsumerState<SelectTeamMember> {
                     ref.read(userFilterProvider.notifier).state = value;
                   },
               ),
-              SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    DisplayListOfUsers(
-                      assignedUsers: filterUsers(users,userFilter),
-                      isSelect: true,
-                    ),
-                  ],
-                ),
+              fetchedUsers.when(
+                  data: (fetchedUsers){
+                    List<User> users = fetchedUsers;
+                    return SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          DisplayListOfUsers(
+                            assignedUsers: filterUsers(users,userFilter),
+                            isSelect: true,
+                            scaffoldKey: widget.scaffoldKey,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  error: (err, s) => Text(err.toString()),
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(),
+                  )
               ),
             ],
           ),

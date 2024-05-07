@@ -21,7 +21,7 @@ class DisplayListOfProjects extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deviceSize = context.deviceSize;
-    const emptyProjectsMessage = "There is no project yet";
+    const emptyProjectsMessage = "There are no projects yet";
 
     return CommonContainer(
       height: deviceSize.height*0.68,
