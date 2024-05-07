@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class Project extends Equatable {
-  final int? id;
+  final String? id;
   final String title;
   final String description;
   // final String time;
@@ -18,7 +18,7 @@ class Project extends Equatable {
 
   factory Project.fromJson(Map<String, dynamic> json){
     return Project(
-      id: json['id'],
+      id: json['project_id'],
       title: json['project_name'],
       description: json['project_description'],
     );
