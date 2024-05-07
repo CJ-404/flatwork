@@ -3,6 +3,9 @@ import 'package:http/http.dart';
 import 'package:flatwork/data/data.dart';
 
 class ApiServices{
+  // use 10.0.2.2 if running using the emulator
+
+  // use your server machine ip address when mobile and server connected to the same network
   String endpoint = "http://192.168.1.3:8080/mpma/api/v1";
 
   Future<List<Project>> getProjects() async {
