@@ -27,7 +27,7 @@ class _SelectTeamMemberState extends ConsumerState<SelectTeamMember> {
   // }
 
   List<User> filterUsers(List<User> allUsers, String filterString){
-    final availableUsers = allUsers.where((user) => !widget.assignedMembers.contains(user)).toList();
+    final availableUsers = allUsers.where((user) => widget.assignedMembers.where((assignedMember) => assignedMember.id == user.id ).toList().isEmpty ).toList();
     if (filterString.isEmpty) {
       return availableUsers; // Return all users if no filter text
     }
