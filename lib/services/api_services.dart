@@ -1,12 +1,9 @@
-
 import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
 import 'package:flatwork/data/data.dart';
 
 class ApiServices{
-  String endpoint = "http://localhost:8080/mpma/api/v1/";
+  String endpoint = "http://192.168.1.3:8080/mpma/api/v1";
 
   Future<List<Project>> getProjects() async {
     final url = Uri.parse("$endpoint/project/get_all_projects");
@@ -21,7 +18,7 @@ class ApiServices{
   }
 
   Future<Project> getProject(String projectId) async {
-    final url = Uri.parse("project/$endpoint?projectID=$projectId");
+    final url = Uri.parse("$endpoint/project/get_project_by_project_id?projectID=$projectId");
     Response response = await get(url);
     if (response.statusCode == 200){
       final result = jsonDecode(response.body)['data'];
@@ -33,7 +30,7 @@ class ApiServices{
   }
 
   Future<List<Task>> getTasks(String projectId) async {
-    final url = Uri.parse("${endpoint}task/get_all_tasks_by_project_id?projectID=$projectId");
+    final url = Uri.parse("$endpoint/task/get_all_tasks_by_project_id?projectID=$projectId");
     Response response = await get(url);
     if (response.statusCode == 200){
       final List result = jsonDecode(response.body)['data'];
@@ -45,7 +42,7 @@ class ApiServices{
   }
 
   Future<Task> getTask(String taskId) async {
-    final url = Uri.parse("task/$endpoint?taskID=$taskId");
+    final url = Uri.parse("$endpoint/task/get_task_by_id?taskID=$taskId");
     Response response = await get(url);
     if (response.statusCode == 200){
       final result = jsonDecode(response.body)['data'];
@@ -57,7 +54,7 @@ class ApiServices{
   }
 
   Future<List<User>> getUsers() async {
-    final url = Uri.parse("${endpoint}user/get_all_users");
+    final url = Uri.parse("$endpoint/user/get_all_team_members");
     Response response = await get(url);
     if (response.statusCode == 200){
       final List result = jsonDecode(response.body)['data'];
@@ -98,12 +95,19 @@ class ApiServices{
   // "project_description":"test_project_description"
   // }
   Future<bool> createProject(Project project) async {
-    final url = Uri.parse("${endpoint}project/initialize_project");
-    final body =  {
+    final url = Uri.parse("$endpoint/project/initialize_project");
+    final body =  jsonEncode({
       "project_name": project.title,
       "project_description":project.description,
-    };
-    Response response = await post(url,body: body);
+    });
+    Response response = await post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+        },
+        body: body
+    );
     if (response.statusCode == 201){
       // final List result = jsonDecode(response.body)['data'];
       return true;
@@ -119,13 +123,20 @@ class ApiServices{
   // "project_id":"1954a51d-5"
   // }
   Future<bool> addTask(Task task, String projectId) async {
-    final url = Uri.parse("${endpoint}project/create_task");
-    final body =  {
+    final url = Uri.parse("$endpoint/project/create_task");
+    final body =  jsonEncode({
       "task_name":task.title,
       "task_description":task.description,
       "project_id":projectId,
-    };
-    Response response = await post(url,body: body);
+    });
+    Response response = await post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+        },
+        body: body
+    );
     if (response.statusCode == 201){
       // final List result = jsonDecode(response.body)['data'];
       return true;
@@ -140,13 +151,20 @@ class ApiServices{
   // "teamMemberID":"2da64477"
   // }
   Future<bool> assignTeamMember(User user, String taskId) async {
-    final url = Uri.parse("${endpoint}task/assign_team_member_to_task");
-    final body =  {
+    final url = Uri.parse("$endpoint/task/assign_team_member_to_task");
+    final body =  jsonEncode({
       "taskID":taskId,
       "teamMemberID":user.id,
-    };
-    Response response = await put(url,body: body);
-    if (response.statusCode == 201){
+    });
+    Response response = await put(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+        },
+        body: body
+    );
+    if (response.statusCode == 200){
       // final List result = jsonDecode(response.body)['data'];
       return true;
     }
@@ -160,13 +178,20 @@ class ApiServices{
   // "teamMemberID":"2da64477"
   // }
   Future<bool> removeAssignedTeamMember(String userId, String taskId) async {
-    final url = Uri.parse("${endpoint}task/remove_team_member_from_task");
-    final body =  {
+    final url = Uri.parse("$endpoint/task/remove_team_member_from_task");
+    final body =  jsonEncode({
       "taskID":taskId,
       "teamMemberID":userId,
-    };
-    Response response = await put(url,body: body);
-    if (response.statusCode == 201){
+    });
+    Response response = await put(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+        },
+        body: body
+    );
+    if (response.statusCode == 200){
       // final List result = jsonDecode(response.body)['data'];
       return true;
     }
