@@ -7,12 +7,12 @@ final taskIdProvider = StateProvider<String>((ref) {
   return "";
 });
 
-final tasksProvider = FutureProvider<List<Task>>((ref) async {
+final tasksProvider = FutureProvider.autoDispose<List<Task>>((ref) async {
   final String projectId = ref.watch(projectIdProvider);
   return ref.watch(apiServiceProvider).getTasks(projectId);
 });
 
-final taskProvider = FutureProvider<Task>((ref) async {
+final taskProvider = FutureProvider.autoDispose<Task>((ref) async {
   final String taskId = ref.watch(taskIdProvider);
   return ref.watch(apiServiceProvider).getTask(taskId);
 });

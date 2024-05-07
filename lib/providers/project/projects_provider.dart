@@ -7,11 +7,11 @@ final projectIdProvider = StateProvider<String>((ref) {
   return "";
 });
 
-final projectsProvider = FutureProvider<List<Project>>((ref) async {
+final projectsProvider = FutureProvider.autoDispose<List<Project>>((ref) async {
   return ref.watch(apiServiceProvider).getProjects();
 });
 
-final projectProvider = FutureProvider<Project>((ref) async {
+final projectProvider = FutureProvider.autoDispose<Project>((ref) async {
   final String projectId = ref.watch(projectIdProvider);
   return ref.watch(apiServiceProvider).getProject(projectId);
 });
