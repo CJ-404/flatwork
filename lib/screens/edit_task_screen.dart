@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flatwork/data/data.dart';
 import 'package:flatwork/services/auth_services.dart';
 import 'package:flatwork/utils/utils.dart';
@@ -197,6 +198,62 @@ class EditTaskScreen extends ConsumerWidget {
     );
   }
 
+  void _getPermissionOverlay(BuildContext context, WidgetRef ref, PlatformFile selectedFile) async {
+    final userRole = await AuthServices().getSavedUserRole();
+    final colors = context.colorScheme;
+    showDialog(
+      context: context,
+      barrierDismissible: false, // dismiss when tapping outside
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          elevation: 16,
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'upload',
+                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                ),
+                const Divider(thickness: 1.5,),
+                Text(
+                  'Are you sure you want to upload ${selectedFile.name}?',
+                  style: const TextStyle(fontSize: 16.0,),
+                ),
+                const Gap(20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        // upload file to the firebase & send link to the backend
+                        // refresh getting shared files ref
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                      child: const Text('Upload'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        // remove selected file
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void showOverlayDialog(BuildContext context, WidgetRef ref) async {
     final userRole = await AuthServices().getSavedUserRole();
     final colors = context.colorScheme;
@@ -225,7 +282,15 @@ class EditTaskScreen extends ConsumerWidget {
                       ),
                       IconButton(
                         icon: Icon(Icons.add, color: colors.primary,size: 30,),
-                        onPressed: () {
+                        onPressed: () async {
+                          FilePickerResult? result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['pdf','pptx','doc','docx'], // TODO: add more required types
+                          );
+                          if (result == null) return;
+                          // File file = File(result.files.single.path!);
+                          final selectedFile = result.files.first;
+                          _getPermissionOverlay(context, ref, selectedFile);
                         },
                       ),
                     ],
@@ -247,12 +312,6 @@ class EditTaskScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     Navigator.of(context).pop(); // Close the dialog
-                //   },
-                //   child: const Text('Close'),
-                // ),
               ],
             ),
           ),
