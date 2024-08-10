@@ -42,13 +42,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 height: deviceSize.height*0.3,
                 width: deviceSize.width,
                 color: colors.primary,
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    DisplayWhiteText(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
+                          onPressed: () {
+                            ref.read(authProvider.notifier).logout();
+                            context.pushNamed(RouteLocation.login);
+                          },
+                        ),
+                      ],
+                    ),
+                    const DisplayWhiteText(
                         text: 'Project List',
                         fontSize: 40
                     ),
+                    const Gap(50),
                   ],
                 ),
               ),
