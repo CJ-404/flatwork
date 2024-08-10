@@ -202,4 +202,33 @@ class ApiServices{
       throw Exception(response.reasonPhrase);
     }
   }
+
+  Future<User?> login(String email, String password) async {
+    try {
+      // final response = await http.post(
+      //   Uri.parse('https://yourapi.com/login'),
+      //   headers: {'Content-Type': 'application/json'},
+      //   body: jsonEncode({'username': username, 'password': password}),
+      // );
+
+      final List<User> dummyUsers = [
+        const User(firstName: "danusha", lastName: "thilakerathne", email: "danushaThilake@gmail.com",role: "worker"),
+        const User(firstName: "nilusha", lastName: "dissanayake", email: "nilushads@gmail.com",role: "manager"),
+        const User(firstName: "charith", lastName: "jayarangana", email: "charithjayarangana@gmail.com",role: "worker"),
+        const User(firstName: "sandaruwan", lastName: "sandakelum", email: "sandaruwans@gmail.com",role: "worker"),
+      ];
+
+      for (User user in dummyUsers) {
+        if (user.email == email) {
+          return user;
+        }
+      }
+
+      // if user not in the list
+      return null;
+    } catch (e) {
+      print(e);
+      throw Exception('Failed to get login request response');
+    }
+  }
 }
