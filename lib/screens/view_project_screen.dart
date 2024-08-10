@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flatwork/config/config.dart';
 import 'package:flatwork/data/data.dart';
 import 'package:flatwork/providers/providers.dart';
@@ -17,9 +20,9 @@ class ViewProjectScreen extends ConsumerWidget {
   => ViewProjectScreen(
     projectId: projectId,
   );
-  const ViewProjectScreen({
+  ViewProjectScreen({
     super.key,
-    required this.projectId
+    required this.projectId,
   });
 
   final String projectId;
@@ -107,25 +110,41 @@ class ViewProjectScreen extends ConsumerWidget {
                               ref: ref,
                             ),
                             const Gap(20),
-                            ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: colors.secondary,
-                                ),
-                                onPressed: ()
-                                {
-                                  context.pushNamed(
-                                    RouteLocation.addTask,
-                                    pathParameters: {'projectId':projectId},
-                                  );
-                                },
-                                child: const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: DisplayWhiteText(
-                                    text:'Add new Task',
-                                    fontSize: 20,
-                                  ),
-                                )
-                            )
+                            FutureBuilder<String>(
+                              future: AuthServices().getSavedUserRole(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Center(child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Center(child: Text('Error: ${snapshot.error}'));
+                                  // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
+                                  //   return Center(child: Text('User data not found.'));
+                                } else {
+                                  final userRole = snapshot.data!;
+                                  return (userRole == "manager")?
+                                  ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: colors.secondary,
+                                      ),
+                                      onPressed: ()
+                                      {
+                                        context.pushNamed(
+                                          RouteLocation.addTask,
+                                          pathParameters: {'projectId':projectId},
+                                        );
+                                      },
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: DisplayWhiteText(
+                                          text:'Add new Task',
+                                          fontSize: 20,
+                                        ),
+                                      )
+                                  )
+                                      : Container();
+                                }
+                              },
+                            ),
                           ],
                         ),
                       );
@@ -140,6 +159,62 @@ class ViewProjectScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _getPermissionOverlay(BuildContext context, WidgetRef ref, PlatformFile selectedFile) async {
+    final userRole = await AuthServices().getSavedUserRole();
+    final colors = context.colorScheme;
+    showDialog(
+      context: context,
+      barrierDismissible: false, // dismiss when tapping outside
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          elevation: 16,
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'upload',
+                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                ),
+                const Divider(thickness: 1.5,),
+                Text(
+                  'Are you sure you want to upload ${selectedFile.name}?',
+                  style: const TextStyle(fontSize: 16.0,),
+                ),
+                const Gap(20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        // upload file to the firebase & send link to the backend
+                        // refresh getting shared files ref
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                      child: const Text('Upload'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        // remove selected file
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -171,7 +246,15 @@ class ViewProjectScreen extends ConsumerWidget {
                     ),
                     IconButton(
                       icon: Icon(Icons.add, color: colors.primary,size: 30,),
-                      onPressed: () {
+                      onPressed: () async {
+                        FilePickerResult? result = await FilePicker.platform.pickFiles(
+                          type: FileType.custom,
+                          allowedExtensions: ['pdf','pptx','doc','docx'], // TODO: add more required types
+                        );
+                        if (result == null) return;
+                        // File file = File(result.files.single.path!);
+                        final selectedFile = result.files.first;
+                        _getPermissionOverlay(context, ref, selectedFile);
                       },
                     ),
                   ],
@@ -193,12 +276,6 @@ class ViewProjectScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     Navigator.of(context).pop(); // Close the dialog
-                //   },
-                //   child: const Text('Close'),
-                // ),
               ],
             ),
           ),
