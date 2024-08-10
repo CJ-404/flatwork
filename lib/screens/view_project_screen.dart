@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../services/auth_services.dart';
+import '../widgets/circular_progress_indicator.dart';
 
 class ViewProjectScreen extends ConsumerWidget {
   static ViewProjectScreen builder(BuildContext context, GoRouterState state , String projectId)
@@ -47,17 +48,14 @@ class ViewProjectScreen extends ConsumerWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.circle, color: Colors.green,size: 60),
-                                onPressed: () {
-                                  ref.read(authProvider.notifier).logout();
-                                  context.pushNamed(RouteLocation.login);
-                                },
-                              ),
-                            ],
+                          const Padding(
+                            padding: EdgeInsets.only(left: 20.0, top: 5.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                CircularPercentageIndicator(percentage: 49.0),
+                              ],
+                            ),
                           ),
                           DisplayWhiteText(
                               text: project.title,
