@@ -1,8 +1,10 @@
 import 'package:flatwork/data/data.dart';
+import 'package:flatwork/services/auth_services.dart';
 import 'package:flatwork/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gap/gap.dart';
+import '../widgets/display_list_of_shared_files.dart';
 import '../widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flatwork/providers/providers.dart';
@@ -19,6 +21,7 @@ class EditTaskScreen extends ConsumerWidget {
     // final taskIdState = ref.watch(taskIdProvider);
     final scaffoldKey = GlobalKey<ScaffoldState>();
     final fetchedTask = ref.watch(taskProvider);
+    final colors = context.colorScheme;
 
     return Scaffold(
       key: scaffoldKey,
@@ -27,7 +30,18 @@ class EditTaskScreen extends ConsumerWidget {
         title: fetchedTask.when(
           data: (fetchedTask){
             Task task = fetchedTask;
-            return DisplayWhiteText(text: task.title, fontSize: 20,);
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                DisplayWhiteText(text: task.title, fontSize: 20,),
+                IconButton(
+                  icon: Icon(Icons.edit_document, color: colors.onPrimary,size: 30,),
+                  onPressed: () {
+                    showOverlayDialog(context, ref);
+                  },
+                ),
+              ],
+            );
           },
           error: (error,s) => Text(error.toString()),
           loading: () =>  const Center(
@@ -106,28 +120,44 @@ class EditTaskScreen extends ConsumerWidget {
                               scaffoldKey: scaffoldKey,
                             ),
                             const Gap(20),
-                            ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.cyan,
-                                ),
-                                onPressed: () async {
-                                  ref.read(userFilterProvider.notifier).state = "";
-                                  await showModalBottomSheet(
-                                    // showDragHandle: true,
-                                    context: context,
-                                    builder: (ctx) {
-                                      return SelectTeamMember(assignedMembers: task.assignedUser==null? []:[task.assignedUser!],scaffoldKey: scaffoldKey,);
-                                    },
-                                  );
-                                },
-                                child: const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: DisplayWhiteText(
-                                    text:'Assign a team member',
-                                    fontSize: 20,
-                                  ),
-                                )
-                            )
+                            FutureBuilder<String>(
+                              future: AuthServices().getSavedUserRole(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Center(child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Center(child: Text('Error: ${snapshot.error}'));
+                                // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
+                                //   return Center(child: Text('User data not found.'));
+                                } else {
+                                  final userRole = snapshot.data!;
+                                  return (userRole == "manager")?
+                                    ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.cyan,
+                                        ),
+                                        onPressed: () async {
+                                          ref.read(userFilterProvider.notifier).state = "";
+                                          await showModalBottomSheet(
+                                            // showDragHandle: true,
+                                            context: context,
+                                            builder: (ctx) {
+                                              return SelectTeamMember(assignedMembers: task.assignedUser==null? []:[task.assignedUser!],scaffoldKey: scaffoldKey,);
+                                            },
+                                          );
+                                        },
+                                        child: const Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: DisplayWhiteText(
+                                            text:'Assign a team member',
+                                            fontSize: 20,
+                                          ),
+                                        )
+                                    )
+                                  : Container();
+                                }
+                              },
+                            ),
                           ],
                         ),
                       );
@@ -142,6 +172,70 @@ class EditTaskScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void showOverlayDialog(BuildContext context, WidgetRef ref) async {
+    final userRole = await AuthServices().getSavedUserRole();
+    final colors = context.colorScheme;
+    showDialog(
+      context: context,
+      barrierDismissible: true, // dismiss when tapping outside
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          elevation: 16,
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                (userRole == "manager")?
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Shared task files',
+                        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.add, color: colors.primary,size: 30,),
+                        onPressed: () {
+                        },
+                      ),
+                    ],
+                  )
+                :
+                  const Text(
+                    'Shared task files',
+                    style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                  ),
+                const Divider(thickness: 1.5,),
+                //list of shared files
+                SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      DisplayListOfSharedFiles(sharedFiles: const ["asa1","fathead1"], ref: ref),
+                    ],
+                  ),
+                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     Navigator.of(context).pop(); // Close the dialog
+                //   },
+                //   child: const Text('Close'),
+                // ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
