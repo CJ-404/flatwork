@@ -1,11 +1,11 @@
 import 'package:equatable/equatable.dart';
-import 'package:flatwork/data/data.dart';
 
 class User extends Equatable {
   final String? id;
   final String firstName;
   final String lastName;
   final String email;
+  final String? role; //TODO: role should be  required field
   // final String contact;
 
   const User( {
@@ -13,6 +13,7 @@ class User extends Equatable {
     required this.firstName,
     required this.lastName,
     required this.email,
+    this.role,
     // required this.contact,
   });
 
