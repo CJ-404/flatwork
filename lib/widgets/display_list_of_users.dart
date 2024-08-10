@@ -26,7 +26,7 @@ class DisplayListOfUsers extends ConsumerWidget {
     final emptyUsersMessage = isSelect!? "There are no users found" : "haven't assigned an user yet";
 
     return CommonContainer(
-      height: isSelect!? deviceSize.height*0.3 : deviceSize.height*0.48,
+      height: isSelect!? deviceSize.height*0.25 : deviceSize.height*0.30,
       color: context.colorScheme.onPrimary,
       child: assignedUsers.isEmpty?
       Center(
