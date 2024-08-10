@@ -1,11 +1,7 @@
-import 'package:flatwork/providers/providers.dart';
 import 'package:flatwork/utils/utils.dart';
 import 'package:flatwork/widgets/shared_file_tile.dart';
 import 'package:flatwork/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import '../config/routes/routes.dart';
-import '../data/data.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DisplayListOfSharedFiles extends StatelessWidget {

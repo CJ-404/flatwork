@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'package:http/http.dart';
-import 'package:flatwork/data/data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // TODO: handle when no auth data

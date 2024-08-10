@@ -214,7 +214,7 @@ class ApiServices{
       final List<User> dummyUsers = [
         const User(firstName: "danusha", lastName: "thilakerathne", email: "danushaThilake@gmail.com",role: "worker"),
         const User(firstName: "nilusha", lastName: "dissanayake", email: "nilushads@gmail.com",role: "manager"),
-        const User(firstName: "charith", lastName: "jayarangana", email: "charithjayarangana@gmail.com",role: "worker"),
+        const User(firstName: "charith", lastName: "jayarangana", email: "charithjayarangana@gmail.com",role: "manager"),
         const User(firstName: "sandaruwan", lastName: "sandakelum", email: "sandaruwans@gmail.com",role: "worker"),
       ];
 

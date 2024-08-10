@@ -1,4 +1,3 @@
-import 'package:flatwork/data/data.dart';
 import 'package:flatwork/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
