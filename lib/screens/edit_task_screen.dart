@@ -1,6 +1,7 @@
 import 'package:flatwork/data/data.dart';
 import 'package:flatwork/services/auth_services.dart';
 import 'package:flatwork/utils/utils.dart';
+import 'package:flatwork/widgets/progress_bar_with_labels.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gap/gap.dart';
@@ -92,6 +93,27 @@ class EditTaskScreen extends ConsumerWidget {
                       child: CircularProgressIndicator(),
                     )
                 ),
+                const Gap(30),
+                Text(
+                  "Progress",
+                  style: context.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25,
+                  ),
+                ),
+                const Divider(
+                  thickness: 1,
+                  color: Colors.black,
+                ),
+                Text(
+                  "Make sure to update your task progress so that project managers can view task status",
+                  style: context.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 18,
+                  ),
+                ),
+                const Gap(20),
+                const ProgressBarWithLabels(),
                 const Gap(30),
                 Text(
                   "Assigned User",
