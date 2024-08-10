@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "864086738039",
+    "project_id": "flatwork-eb6af",
+    "storage_bucket": "flatwork-eb6af.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864086738039:android:20bc4af7afda6b344f3272",
+        "android_client_info": {
+          "package_name": "com.threadCoders.flatwork"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDW2Wo2RhlaY5zeCe1JixvgkrfaSAktafE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
