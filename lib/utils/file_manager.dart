@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -16,7 +15,7 @@ class FileManager{
 
     await FirebaseAuth.instance.signInAnonymously();
     // define the path and file name to upload
-    Reference ref = _storage.ref().child('$location.${selectedFile.name}');
+    Reference ref = _storage.ref().child('$location${selectedFile.name}');
 
     final uploadTask = ref.putFile(file);
     final isConnected = await hasNetworkConnection(); // Implement network check function
@@ -30,6 +29,16 @@ class FileManager{
 
     String downloadUrl = await ref.getDownloadURL();
     return downloadUrl;
+  }
+
+  Future<FullMetadata> getFileMetaData(String fileUrl) async {
+    final httpsReference = _storage.refFromURL(fileUrl);
+
+    // Get metadata properties
+    final metadata = await httpsReference.getMetadata();
+    print("Meta data: ${metadata.name}");
+
+    return metadata;
   }
 
   Future<bool> hasNetworkConnection() async {
