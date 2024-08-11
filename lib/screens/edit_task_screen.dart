@@ -318,7 +318,7 @@ class EditTaskScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       DisplayListOfSharedFiles(
-                          sharedFilesLinks:
+                          sharedFileLinks:
                           const [
                             "https://firebasestorage.googleapis.com/v0/b/flatwork-23243.appspot.com/o/shared_files%2Fproject%2FTentative%20Timetable-%20UG%20SEM%201%20-%20(AY21).pdf?alt=media&token=75aa8273-b3bc-4f61-a3c6-049aa1c18e35",
                             "https://firebasestorage.googleapis.com/v0/b/flatwork-23243.appspot.com/o/shared_files%2Ftask%2FPadura%2023%20-%20Agenda%20-%20Colored.pdf?alt=media&token=57475645-3154-4431-bbb8-e62f8e9d820c",

@@ -31,6 +31,18 @@ class FileManager{
     return downloadUrl;
   }
 
+  Future<List<String>> getFileNames(List<String> fileUrls) async {
+    List<String> fileNames = await Future.wait(
+        fileUrls.map(
+          (url)  async {
+            return (await getFileMetaData(url)).name;
+          }
+        ).toList()
+    );
+
+    return fileNames;
+  }
+
   Future<FullMetadata> getFileMetaData(String fileUrl) async {
     final httpsReference = _storage.refFromURL(fileUrl);
 

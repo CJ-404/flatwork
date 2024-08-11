@@ -7,11 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class DisplayListOfSharedFiles extends StatelessWidget {
   const DisplayListOfSharedFiles({
     super.key,
-    required this.sharedFilesLinks,
+    required this.sharedFileLinks,
     required this.ref
   });
 
-  final List<String> sharedFilesLinks;
+  final List<String> sharedFileLinks;
   final WidgetRef ref;
 
   // TODO: fetch file names for links from firebase
@@ -25,7 +25,7 @@ class DisplayListOfSharedFiles extends StatelessWidget {
     return CommonContainer(
       height: deviceSize.height*0.4,
       color: context.colorScheme.onPrimary,
-      child: sharedFilesLinks.isEmpty?
+      child: sharedFileLinks.isEmpty?
       Center(
         child: Text(
           emptyTasksMessage,
@@ -33,18 +33,34 @@ class DisplayListOfSharedFiles extends StatelessWidget {
         ),
       )
           :
-      ListView.separated(
-        shrinkWrap: true,
-        itemCount: sharedFilesLinks.length,
-        itemBuilder: (ctx, index) {
-          final sharedFileLink = sharedFilesLinks[index];
+      FutureBuilder<List<String>>(
+        future: FileManager().getFileNames(sharedFileLinks),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+            // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
+            //   return Center(child: Text('User data not found.'));
+          } else {
+            final sharedFileNames = snapshot.data!;
+            return ListView.separated(
+              shrinkWrap: true,
+              itemCount: sharedFileNames.length,
+              itemBuilder: (ctx, index) {
+                final sharedFileLink = sharedFileLinks[index];
+                final sharedFileName = sharedFileNames[index];
 
-          return SharedFileTile(
-            fileName: sharedFileLink, url: sharedFileLink,
-          );
-        }, separatorBuilder: (BuildContext context, int index) {
-        return const Divider(thickness: 1.0,);
-      },
+                return SharedFileTile(
+                  fileName: sharedFileName, url: sharedFileLink,
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return const Divider(thickness: 1.0,);
+              },
+            );
+          }
+        },
       ),
     );
   }

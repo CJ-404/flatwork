@@ -25,7 +25,7 @@ class SharedFileTile extends StatelessWidget {
                   fileName,
                   style: style.titleMedium?.copyWith(
                     fontWeight: FontWeight.normal,
-                    fontSize: 20,
+                    fontSize: 17,
                   ),
                 ),
               ],
@@ -34,10 +34,9 @@ class SharedFileTile extends StatelessWidget {
           icon: Icon(Icons.download, color: colors.primary,size: 25,),
           onPressed: () async {
             //TODO: download from url
-            // print('This is url: $url');
-            FileDownloader.downloadFile(
+            final file = await FileDownloader.downloadFile(
                 url: url,
-                name: "Padura 23 - Agenda - Colored.pdf",
+                name: fileName,
                 onProgress: (name, progress) {
                   print ("nam: $name, progress: $progress");
                 },
@@ -45,7 +44,21 @@ class SharedFileTile extends StatelessWidget {
                   print('Path: $path');
                 }
             );
-            // FileManager().getFileMetaData(url);
+            // Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text((file == null)? "file not downloaded" : "file downloaded"),
+                    const SizedBox(width: 10),
+                    Icon( (file == null)? Icons.error_outline_rounded : Icons.check_box_outlined, color: Colors.black54),
+                  ],
+                ),
+                backgroundColor: (file == null)? Colors.red : Colors.green,
+              ),
+            );
           },
         ),
       ],
