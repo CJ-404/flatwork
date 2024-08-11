@@ -103,7 +103,7 @@ class _CreateProjectScreenState extends ConsumerState<CreateProjectScreen> {
 
     ref.read(loadingProvider.notifier).state = true;
     try{
-      final response = await ApiServices().createProject(Project(title: title, description: description));
+      final response = await ApiServices().createProject(Project(title: title, description: description, progress: 0.0));
       if(response){
         ref.read(loadingProvider.notifier).state = false;
         if(_scaffoldKey.currentState != null) {

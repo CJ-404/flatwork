@@ -1,9 +1,12 @@
+import 'dart:ffi';
+
 import 'package:equatable/equatable.dart';
 
 class Project extends Equatable {
   final String? id;
   final String title;
   final String description;
+  final double progress;
   // final String time;
   // final String date;
   // final bool completed;
@@ -12,6 +15,7 @@ class Project extends Equatable {
     this.id,
     required this.title,
     required this.description,
+    required this.progress,
     // required this.time,
     // required this.date
   });
@@ -21,6 +25,7 @@ class Project extends Equatable {
       id: json['project_id'],
       title: json['project_name'],
       description: json['project_description'],
+      progress: json['projectProgressStatus'],
     );
   }
 
@@ -39,6 +44,7 @@ class Project extends Equatable {
       id!,
       title,
       description,
+      progress,
       // time,
       // date,
     ];
