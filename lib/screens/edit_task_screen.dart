@@ -236,11 +236,41 @@ class EditTaskScreen extends ConsumerWidget {
                           // upload file to the firebase
                           final uploadedUrl = await FileManager().uploadFile(pickedFile, 'shared_files/task/');
                           print('upload Url : $uploadedUrl');
-                          // & send link to the backend
-                          // refresh getting shared files ref
+
+                          // TODO: send link to the backend
+                          // TODO: refresh getting shared files ref
+                          // for now just pop from context to load again by taping
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                // mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text("file uploaded!"),
+                                  SizedBox(width: 10),
+                                  Icon(Icons.check_box_outlined, color: Colors.black54),
+                                ],
+                              ),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
                         }
                         catch (e){
                           print('error: $e');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                // mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text("file not uploaded! error occurred"),
+                                  SizedBox(width: 10),
+                                  Icon( Icons.error_outline_rounded , color: Colors.black54),
+                                ],
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
                         }
                         Navigator.of(context).pop(); // Close the dialog
                       },
@@ -299,6 +329,7 @@ class EditTaskScreen extends ConsumerWidget {
                           if (pickedFile == null) return;
                           // File file = File(pickedFile.files.single.path!);
                           // final selectedFile = pickedFile.files.first;
+                          Navigator.of(context).pop();
                           _getPermissionOverlay(context, ref, pickedFile);
                         },
                       ),
