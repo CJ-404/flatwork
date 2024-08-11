@@ -7,12 +7,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class DisplayListOfSharedFiles extends StatelessWidget {
   const DisplayListOfSharedFiles({
     super.key,
-    required this.sharedFiles,
+    required this.sharedFilesLinks,
     required this.ref
   });
 
-  final List<String> sharedFiles;
+  final List<String> sharedFilesLinks;
   final WidgetRef ref;
+
+  // TODO: fetch file names for links from firebase
+  // late List<String> sharedFilesNames;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +25,7 @@ class DisplayListOfSharedFiles extends StatelessWidget {
     return CommonContainer(
       height: deviceSize.height*0.4,
       color: context.colorScheme.onPrimary,
-      child: sharedFiles.isEmpty?
+      child: sharedFilesLinks.isEmpty?
       Center(
         child: Text(
           emptyTasksMessage,
@@ -32,12 +35,12 @@ class DisplayListOfSharedFiles extends StatelessWidget {
           :
       ListView.separated(
         shrinkWrap: true,
-        itemCount: sharedFiles.length,
+        itemCount: sharedFilesLinks.length,
         itemBuilder: (ctx, index) {
-          final sharedFile = sharedFiles[index];
+          final sharedFileLink = sharedFilesLinks[index];
 
           return SharedFileTile(
-            fileName: sharedFile,
+            fileName: sharedFileLink, url: sharedFileLink,
           );
         }, separatorBuilder: (BuildContext context, int index) {
         return const Divider(thickness: 1.0,);
