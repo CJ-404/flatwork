@@ -28,6 +28,10 @@ class ProgressBarWithLabels extends ConsumerWidget {
             // Display the Slider
             Slider(
               value: progressValue,
+              activeColor: (progressValue < 30.0 )? Colors.orange
+                  : (progressValue < 50.0 )? Colors.orangeAccent
+                  :(progressValue < 80.0 )? Colors.blue
+                  : Colors.green,
               min: 0,
               max: 100,
               divisions: 100, // Allows selection of any percentage

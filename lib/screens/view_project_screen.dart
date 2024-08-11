@@ -79,11 +79,14 @@ class ViewProjectScreen extends ConsumerWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              IconButton(
-                                icon: Icon(Icons.edit_document, color: colors.onPrimary,size: 30,),
-                                onPressed: () {
-                                  showOverlayDialog(context, ref);
-                                },
+                              Padding(
+                                padding: const EdgeInsets.only(right: 15.0),
+                                child: IconButton(
+                                  icon: Icon(Icons.edit_document, color: colors.onPrimary,size: 35,),
+                                  onPressed: () {
+                                    showOverlayDialog(context, ref);
+                                  },
+                                ),
                               ),
                             ],
                           ),
