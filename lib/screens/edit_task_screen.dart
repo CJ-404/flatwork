@@ -298,23 +298,28 @@ class EditTaskScreen extends ConsumerWidget {
 
   void showOverlayDialog(BuildContext context, WidgetRef ref) async {
     final userRole = await AuthServices().getSavedUserRole();
-    final colors = context.colorScheme;
-    showDialog(
-      context: context,
-      barrierDismissible: true, // dismiss when tapping outside
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          elevation: 16,
-          child: Container(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                (userRole == "manager")?
+    try{
+      final files = await ApiServices().getTaskFiles(taskId);
+      final fileLinks = files.map((file) => file.url).toList();
+      // print(fileLinks);
+
+      final colors = context.colorScheme;
+      showDialog(
+        context: context,
+        barrierDismissible: true, // dismiss when tapping outside
+        builder: (BuildContext context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            elevation: 16,
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  (userRole == "manager")?
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -338,32 +343,53 @@ class EditTaskScreen extends ConsumerWidget {
                       ),
                     ],
                   )
-                :
+                      :
                   const Text(
                     'Shared task files',
                     style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                   ),
-                const Divider(thickness: 1.5,),
-                //list of shared files
-                SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      DisplayListOfSharedFiles(
-                          sharedFileLinks:
-                          const [],
-                          ref: ref
-                      ),
-                    ],
+                  const Divider(thickness: 1.5,),
+                  //list of shared files
+                  SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        DisplayListOfSharedFiles(
+                            sharedFileLinks:
+                            fileLinks,
+                            ref: ref
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
+          );
+        },
+      );
+    }
+    catch (e)
+    {
+      print(e);
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Check your connection!"),
+              SizedBox(width: 10),
+              Icon( Icons.error_outline_rounded , color: Colors.black54),
+            ],
           ),
-        );
-      },
-    );
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
   }
 }
