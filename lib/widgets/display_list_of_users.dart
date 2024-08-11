@@ -5,6 +5,7 @@ import '../data/data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/providers.dart';
 import '../services/api_services.dart';
+import '../services/auth_services.dart';
 
 
 class DisplayListOfUsers extends ConsumerWidget {
@@ -24,44 +25,65 @@ class DisplayListOfUsers extends ConsumerWidget {
     final deviceSize = context.deviceSize;
     final emptyUsersMessage = isSelect!? "There are no users found" : "haven't assigned an user yet";
 
-    return CommonContainer(
-      height: isSelect!? deviceSize.height*0.25 : deviceSize.height*0.30,
-      color: context.colorScheme.onPrimary,
-      child: assignedUsers.isEmpty?
-      Center(
-        child: Text(
-          emptyUsersMessage,
-          style: context.textTheme.headlineSmall!.copyWith(
-            fontSize: 18,
-          ),
-        ),
-      )
-          :
-      ListView.separated(
-        shrinkWrap: true,
-        itemCount: assignedUsers.length,
-        itemBuilder: (ctx, index) {
-          final assignedUser = assignedUsers[index];
+    return FutureBuilder(
+        future: AuthServices().getSavedUserRole(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+            // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
+            //   return Center(child: Text('User data not found.'));
+          } else {
+            final userRole = snapshot.data!;
+            return CommonContainer(
+              height: (userRole == "manager")? isSelect! ?
+                      deviceSize.height * 0.25 : deviceSize.height * 0.30
+                  :
+                      isSelect! ? deviceSize.height * 0.3 : deviceSize.height * 0.46,
+              color: context.colorScheme.onPrimary,
+              child: assignedUsers.isEmpty ?
+              Center(
+                child: Text(
+                  emptyUsersMessage,
+                  style: context.textTheme.headlineSmall!.copyWith(
+                    fontSize: 18,
+                  ),
+                ),
+              )
+                  :
+              ListView.separated(
+                shrinkWrap: true,
+                itemCount: assignedUsers.length,
+                itemBuilder: (ctx, index) {
+                  final assignedUser = assignedUsers[index];
 
-          return InkWell(
-              onTap: () async {
-                if (isSelect!){
-                  await _assignUser(assignedUser, ref);
-                  ref.read(userFilterProvider.notifier).state = "";
-                  ref.refresh(taskProvider);
-                  Navigator.pop(scaffoldKey.currentContext!);
-                }
-
-              },
-              child: !isSelect!?
-                    UserTile(user: assignedUser, isSelect: isSelect!, onDelete: (){_removeMember(assignedUser.id.toString(), ref);},)
+                  return InkWell(
+                    onTap: () async {
+                      if (isSelect!) {
+                        await _assignUser(assignedUser, ref);
+                        ref
+                            .read(userFilterProvider.notifier)
+                            .state = "";
+                        ref.refresh(taskProvider);
+                        Navigator.pop(scaffoldKey.currentContext!);
+                      }
+                    },
+                    child: !isSelect! ?
+                    UserTile(
+                      user: assignedUser, isSelect: isSelect!, onDelete: () {
+                      _removeMember(assignedUser.id.toString(), ref);
+                    },)
                         :
                     UserTile(user: assignedUser, isSelect: isSelect!),
-          );
-        }, separatorBuilder: (BuildContext context, int index) {
-        return const Divider(thickness: 1.5,);
-      },
-      ),
+                  );
+                }, separatorBuilder: (BuildContext context, int index) {
+                return const Divider(thickness: 1.5,);
+              },
+              ),
+            );
+          }
+        }
     );
   }
 

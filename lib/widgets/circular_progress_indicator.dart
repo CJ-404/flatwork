@@ -12,8 +12,8 @@ class CircularPercentageIndicator extends StatelessWidget {
       children: [
         // Background circle for progress
         SizedBox(
-          width: 60,
-          height: 60,
+          width: 55,
+          height: 55,
           child: CircularProgressIndicator(
             value: percentage / 100,
             strokeWidth: 8.0,

@@ -32,12 +32,36 @@ class ApiServices{
     }
   }
 
+  Future<List<File>> getProjectFiles(String projectId) async {
+    final url = Uri.parse("$endpoint/file/getProjectFile?projectID=$projectId");
+    Response response = await get(url);
+    if (response.statusCode == 200){
+      final List result = jsonDecode(response.body)['data'];
+      return result.map(((data) => File.fromJson(data))).toList();
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
   Future<List<Task>> getTasks(String projectId) async {
     final url = Uri.parse("$endpoint/task/get_all_tasks_by_project_id?projectID=$projectId");
     Response response = await get(url);
     if (response.statusCode == 200){
       final List result = jsonDecode(response.body)['data'];
       return result.map(((e) => Task.fromJson(e))).toList();
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
+  Future<List<File>> getTaskFiles(String taskId) async {
+    final url = Uri.parse("$endpoint/file/getTaskFile?taskId=$taskId");
+    Response response = await get(url);
+    if (response.statusCode == 200){
+      final List result = jsonDecode(response.body)['data'];
+      return result.map(((data) => File.fromJson(data))).toList();
     }
     else {
       throw Exception(response.reasonPhrase);
@@ -120,6 +144,30 @@ class ApiServices{
     }
   }
 
+  Future<bool> createProjectFile(String projectId, String fileName, String fileUrl) async {
+    final url = Uri.parse("$endpoint/file/addProjectFile");
+    final body =  jsonEncode({
+      "fileName":fileName,
+      "fileURL":fileUrl,
+      "projectid": projectId,
+    });
+    Response response = await post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+        },
+        body: body
+    );
+    if (response.statusCode == 201){
+      // final List result = jsonDecode(response.body)['data'];
+      return true;
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
   // {
   // "task_name":"test task3",
   // "task_description":"test task description",
@@ -141,6 +189,53 @@ class ApiServices{
         body: body
     );
     if (response.statusCode == 201){
+      // final List result = jsonDecode(response.body)['data'];
+      return true;
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
+  Future<bool> createTaskFile(String taskId, String fileName, String fileUrl) async {
+    final url = Uri.parse("$endpoint/file/addTaskFile");
+    final body =  jsonEncode({
+      "fileName":fileName,
+      "fileURL":fileUrl,
+      "taskid": taskId,
+    });
+    Response response = await post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+        },
+        body: body
+    );
+    if (response.statusCode == 201){
+      // final List result = jsonDecode(response.body)['data'];
+      return true;
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
+  Future<bool> updateTaskProgress(String taskId, double progressValue) async {
+    final url = Uri.parse("$endpoint/task/updateTaskProgress");
+    final body =  jsonEncode({
+      "taskId": taskId,
+      "progressPercentage": progressValue,
+    });
+    Response response = await put(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+        },
+        body: body
+    );
+    if (response.statusCode == 200){
       // final List result = jsonDecode(response.body)['data'];
       return true;
     }
@@ -227,7 +322,7 @@ class ApiServices{
       // if user not in the list
       return null;
     } catch (e) {
-      print(e);
+      // print(e);
       throw Exception('Failed to get login request response');
     }
   }
