@@ -38,7 +38,7 @@ class SharedFileTile extends StatelessWidget {
                 url: url,
                 name: fileName,
                 onProgress: (name, progress) {
-                  print ("nam: $name, progress: $progress");
+                  print ("name: $name, progress: $progress");
                 },
                 onDownloadCompleted: (path){
                   print('Path: $path');

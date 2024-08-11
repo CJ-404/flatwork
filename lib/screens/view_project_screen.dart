@@ -262,74 +262,96 @@ class ViewProjectScreen extends ConsumerWidget {
 
   void showOverlayDialog(BuildContext context, WidgetRef ref) async {
     final userRole = await AuthServices().getSavedUserRole();
-    final colors = context.colorScheme;
-    showDialog(
-      context: context,
-      barrierDismissible: true, // dismiss when tapping outside
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          elevation: 16,
-          child: Container(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                (userRole == "manager")?
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Shared project files',
-                      style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.add, color: colors.primary,size: 30,),
-                      onPressed: () async {
-                        FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
-                          type: FileType.custom,
-                          allowedExtensions: ['pdf','pptx','doc','docx'], // TODO: add more required types
-                        );
-                        if (pickedFile == null) return;
-                        // File file = File(result.files.single.path!);
-                        // final selectedFile = result.files.first;
-                        Navigator.of(context).pop();
-                        _getPermissionOverlay(context, ref, pickedFile);
-                      },
-                    ),
-                  ],
-                )
-                    :
-                const Text(
-                  'Shared project files',
-                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                ),
-                const Divider(thickness: 1.5,),
-                //list of shared files
-                SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  // padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      DisplayListOfSharedFiles(
-                          sharedFileLinks:
-                          const [
-                            "https://firebasestorage.googleapis.com/v0/b/flatwork-23243.appspot.com/o/shared_files%2Fproject%2FTentative%20Timetable-%20UG%20SEM%201%20-%20(AY21).pdf?alt=media&token=75aa8273-b3bc-4f61-a3c6-049aa1c18e35",
-                            "https://firebasestorage.googleapis.com/v0/b/flatwork-23243.appspot.com/o/shared_files%2Ftask%2FPadura%2023%20-%20Agenda%20-%20Colored.pdf?alt=media&token=57475645-3154-4431-bbb8-e62f8e9d820c",
-                          ],
-                          ref: ref),
-                    ],
-                  ),
-                ),
-              ],
+    try{
+      final files = await ApiServices().getProjectFiles(projectId);
+      final fileLinks = files.map((file) => file.url).toList();
+      // print(fileLinks);
+
+      final colors = context.colorScheme;
+      showDialog(
+        context: context,
+        barrierDismissible: true, // dismiss when tapping outside
+        builder: (BuildContext context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
             ),
+            elevation: 16,
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  (userRole == "manager")?
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Shared project files',
+                        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.add, color: colors.primary,size: 30,),
+                        onPressed: () async {
+                          FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['pdf','pptx','doc','docx'], // TODO: add more required types
+                          );
+                          if (pickedFile == null) return;
+                          // File file = File(result.files.single.path!);
+                          // final selectedFile = result.files.first;
+                          Navigator.of(context).pop();
+                          _getPermissionOverlay(context, ref, pickedFile);
+                        },
+                      ),
+                    ],
+                  )
+                      :
+                  const Text(
+                    'Shared project files',
+                    style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                  ),
+                  const Divider(thickness: 1.5,),
+                  //list of shared files
+                  SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    // padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        DisplayListOfSharedFiles(
+                            sharedFileLinks:
+                            fileLinks,
+                            ref: ref),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+    catch (e) {
+      print(e);
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Check your connection!"),
+              SizedBox(width: 10),
+              Icon( Icons.error_outline_rounded , color: Colors.black54),
+            ],
           ),
-        );
-      },
-    );
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
   }
 }

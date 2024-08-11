@@ -32,6 +32,18 @@ class ApiServices{
     }
   }
 
+  Future<List<File>> getProjectFiles(String projectId) async {
+    final url = Uri.parse("$endpoint/file/getProjectFile?projectID=$projectId");
+    Response response = await get(url);
+    if (response.statusCode == 200){
+      final List result = jsonDecode(response.body)['data'];
+      return result.map(((data) => File.fromJson(data))).toList();
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
   Future<List<Task>> getTasks(String projectId) async {
     final url = Uri.parse("$endpoint/task/get_all_tasks_by_project_id?projectID=$projectId");
     Response response = await get(url);
