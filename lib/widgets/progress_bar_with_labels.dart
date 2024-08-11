@@ -3,12 +3,14 @@ import 'package:flatwork/providers/task/task.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ProgressBarWithLabels extends ConsumerWidget {
-  const ProgressBarWithLabels({super.key});
+  const ProgressBarWithLabels({super.key,required this.progressValue});
+
+  final double progressValue;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch the progressProvider to get the current value
-    final progressValue = ref.watch(progressProvider);
+    // final progressValue = ref.watch(progressProvider);
 
     // Define predefined points
     final List<double> predefinedPoints = [0, 25, 50, 75, 100];
@@ -28,8 +30,8 @@ class ProgressBarWithLabels extends ConsumerWidget {
               divisions: 100, // Allows selection of any percentage
               label: progressValue.round().toString(),
               onChanged: (double value) {
-                // Update the progress value using state management
-                ref.read(progressProvider.notifier).state = value;
+                // TODO: Update the progress value using state management
+                // ref.read(progressProvider.notifier).state = value;
               },
             ),
             // Labels for predefined points
@@ -38,8 +40,8 @@ class ProgressBarWithLabels extends ConsumerWidget {
               children: predefinedPoints.map((point) {
                 return GestureDetector(
                   onTap: () {
-                    // Update the progress value to a predefined point
-                    ref.read(progressProvider.notifier).state = point;
+                    // TODO: Update the progress value to a predefined point
+                    // ref.read(progressProvider.notifier).state = point;
                   },
                   child: Text(
                     '${point.toStringAsFixed(0)}%',

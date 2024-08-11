@@ -8,6 +8,7 @@ class Task extends Equatable {
   final User? assignedUser;
   // final List<User> assignedTeamMembers;
   final bool isCompleted;
+  final double? progress;
   // final String time;
   // final String date;
 
@@ -18,6 +19,8 @@ class Task extends Equatable {
     // required this.assignedTeamMembers,
     this.assignedUser,
     required this.isCompleted,
+    this.progress,
+
     // required this.time,
     // required this.date
   });
@@ -37,6 +40,7 @@ class Task extends Equatable {
       assignedUser: assigned,
       // assignedTeamMembers: const [],//json['teamMembers'],
       isCompleted: false,
+      progress: json['progressStatus'],
     );
   }
 
@@ -59,6 +63,7 @@ class Task extends Equatable {
       assignedUser,
       // assignedTeamMembers,
       isCompleted,
+      progress!,
       // time,
       // date,
     ];
