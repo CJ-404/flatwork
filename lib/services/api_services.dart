@@ -120,6 +120,30 @@ class ApiServices{
     }
   }
 
+  Future<bool> createProjectFile(String projectId, String fileName, String fileUrl) async {
+    final url = Uri.parse("$endpoint/file/addProjectFile");
+    final body =  jsonEncode({
+      "fileName":fileName,
+      "fileURL":fileUrl,
+      "projectid": projectId,
+    });
+    Response response = await post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+        },
+        body: body
+    );
+    if (response.statusCode == 201){
+      // final List result = jsonDecode(response.body)['data'];
+      return true;
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
   // {
   // "task_name":"test task3",
   // "task_description":"test task description",

@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flatwork/config/config.dart';
 import 'package:flatwork/data/data.dart';
 import 'package:flatwork/providers/providers.dart';
+import 'package:flatwork/services/api_services.dart';
 import 'package:flatwork/utils/utils.dart';
 import 'package:flatwork/widgets/display_list_of_shared_files.dart';
 import 'package:flatwork/widgets/widgets.dart';
@@ -201,7 +202,9 @@ class ViewProjectScreen extends ConsumerWidget {
                           final uploadedUrl = await FileManager().uploadFile(pickedFile, 'shared_files/project/');
                           print('upload Url : $uploadedUrl');
 
-                          // TODO: send link to the backend
+                          // send link to the backend
+                          // if not created, exception will pop
+                          final created = await ApiServices().createProjectFile(projectId, pickedFile.files.first.name, uploadedUrl);
                           // TODO: refresh getting shared files ref
                           // for now just pop from context to load again by taping
                           ScaffoldMessenger.of(context).showSnackBar(
