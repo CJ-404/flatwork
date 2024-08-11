@@ -6,6 +6,7 @@ import 'package:flatwork/widgets/progress_bar_with_labels.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gap/gap.dart';
+import '../services/api_services.dart';
 import '../widgets/display_list_of_shared_files.dart';
 import '../widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -237,7 +238,9 @@ class EditTaskScreen extends ConsumerWidget {
                           final uploadedUrl = await FileManager().uploadFile(pickedFile, 'shared_files/task/');
                           print('upload Url : $uploadedUrl');
 
-                          // TODO: send link to the backend
+                          // send link to the backend
+                          // if not created, exception will pop
+                          final created = await ApiServices().createTaskFile(taskId, pickedFile.files.first.name, uploadedUrl);
                           // TODO: refresh getting shared files ref
                           // for now just pop from context to load again by taping
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -350,10 +353,7 @@ class EditTaskScreen extends ConsumerWidget {
                     children: [
                       DisplayListOfSharedFiles(
                           sharedFileLinks:
-                          const [
-                            "https://firebasestorage.googleapis.com/v0/b/flatwork-23243.appspot.com/o/shared_files%2Fproject%2FTentative%20Timetable-%20UG%20SEM%201%20-%20(AY21).pdf?alt=media&token=75aa8273-b3bc-4f61-a3c6-049aa1c18e35",
-                            "https://firebasestorage.googleapis.com/v0/b/flatwork-23243.appspot.com/o/shared_files%2Ftask%2FPadura%2023%20-%20Agenda%20-%20Colored.pdf?alt=media&token=57475645-3154-4431-bbb8-e62f8e9d820c",
-                          ],
+                          const [],
                           ref: ref
                       ),
                     ],

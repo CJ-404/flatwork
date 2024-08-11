@@ -185,6 +185,30 @@ class ApiServices{
     }
   }
 
+  Future<bool> createTaskFile(String taskId, String fileName, String fileUrl) async {
+    final url = Uri.parse("$endpoint/file/addTaskFile");
+    final body =  jsonEncode({
+      "fileName":fileName,
+      "fileURL":fileUrl,
+      "taskid": taskId,
+    });
+    Response response = await post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+        },
+        body: body
+    );
+    if (response.statusCode == 201){
+      // final List result = jsonDecode(response.body)['data'];
+      return true;
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
   // {
   // "taskID":"67ac088b-45",
   // "teamMemberID":"2da64477"
