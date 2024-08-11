@@ -198,9 +198,10 @@ class EditTaskScreen extends ConsumerWidget {
     );
   }
 
-  void _getPermissionOverlay(BuildContext context, WidgetRef ref, PlatformFile selectedFile) async {
+  void _getPermissionOverlay(BuildContext context, WidgetRef ref, FilePickerResult pickedFile) async {
     final userRole = await AuthServices().getSavedUserRole();
     final colors = context.colorScheme;
+    final selectedFile = pickedFile.files.first;
     showDialog(
       context: context,
       barrierDismissible: false, // dismiss when tapping outside
@@ -230,9 +231,17 @@ class EditTaskScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
-                        // upload file to the firebase & send link to the backend
-                        // refresh getting shared files ref
+                      onPressed: () async {
+                        try{
+                          // upload file to the firebase
+                          final uploadedUrl = await FileManager().uploadFile(pickedFile, 'shared_files/task/');
+                          print('upload Url : $uploadedUrl');
+                          // & send link to the backend
+                          // refresh getting shared files ref
+                        }
+                        catch (e){
+                          print('error: $e');
+                        }
                         Navigator.of(context).pop(); // Close the dialog
                       },
                       child: const Text('Upload'),
@@ -283,14 +292,14 @@ class EditTaskScreen extends ConsumerWidget {
                       IconButton(
                         icon: Icon(Icons.add, color: colors.primary,size: 30,),
                         onPressed: () async {
-                          FilePickerResult? result = await FilePicker.platform.pickFiles(
+                          FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
                             type: FileType.custom,
                             allowedExtensions: ['pdf','pptx','doc','docx'], // TODO: add more required types
                           );
-                          if (result == null) return;
-                          // File file = File(result.files.single.path!);
-                          final selectedFile = result.files.first;
-                          _getPermissionOverlay(context, ref, selectedFile);
+                          if (pickedFile == null) return;
+                          // File file = File(pickedFile.files.single.path!);
+                          // final selectedFile = pickedFile.files.first;
+                          _getPermissionOverlay(context, ref, pickedFile);
                         },
                       ),
                     ],
