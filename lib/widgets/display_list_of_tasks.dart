@@ -60,6 +60,7 @@ class DisplayListOfTasks extends StatelessWidget {
                         ref
                             .read(taskIdProvider.notifier)
                             .state = task.id.toString();
+                        ref.read(taskProgressProvider.notifier).state = task.progress!;
                         context.pushNamed(
                           RouteLocation.editTask,
                           pathParameters: {'taskId': task.id.toString()},

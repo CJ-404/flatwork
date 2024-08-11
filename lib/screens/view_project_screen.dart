@@ -21,7 +21,7 @@ class ViewProjectScreen extends ConsumerWidget {
   => ViewProjectScreen(
     projectId: projectId,
   );
-  ViewProjectScreen({
+  const ViewProjectScreen({
     super.key,
     required this.projectId,
   });
@@ -53,10 +53,17 @@ class ViewProjectScreen extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(left: 20.0, top: 5.0),
+                            padding: const EdgeInsets.only(right: 30.0, top: 0.0),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                                IconButton(
+                                  icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
+                                  onPressed: () {
+                                    ref.read(authProvider.notifier).logout();
+                                    context.pushNamed(RouteLocation.login);
+                                  },
+                                ),
                                 CircularPercentageIndicator(percentage: project.progress),
                               ],
                             ),

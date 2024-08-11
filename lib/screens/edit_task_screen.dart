@@ -24,12 +24,12 @@ class EditTaskScreen extends ConsumerWidget {
     // final taskIdState = ref.watch(taskIdProvider);
     final scaffoldKey = GlobalKey<ScaffoldState>();
     final fetchedTask = ref.watch(taskProvider);
+    final progressValue = ref.watch(taskProgressProvider);
     final colors = context.colorScheme;
 
     return fetchedTask.when(
       data: (fetchedTask){
         Task task = fetchedTask;
-        print("pro::${task.progress!}");
         return Scaffold(
           key: scaffoldKey,
           appBar: AppBar(
@@ -100,7 +100,16 @@ class EditTaskScreen extends ConsumerWidget {
                       ),
                     ),
                     const Gap(20),
-                    ProgressBarWithLabels(progressValue: task.progress==null? 0.0: task.progress!,),
+                    Center(
+                      child: Text(
+                        "$progressValue%",
+                        style: context.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                    ProgressBarWithLabels(taskId:taskId),
                     const Gap(30),
                     Text(
                       "Assigned User",

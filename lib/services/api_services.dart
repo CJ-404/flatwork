@@ -221,6 +221,29 @@ class ApiServices{
     }
   }
 
+  Future<bool> updateTaskProgress(String taskId, double progressValue) async {
+    final url = Uri.parse("$endpoint/task/updateTaskProgress");
+    final body =  jsonEncode({
+      "taskId": taskId,
+      "progressPercentage": progressValue,
+    });
+    Response response = await put(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+        },
+        body: body
+    );
+    if (response.statusCode == 200){
+      // final List result = jsonDecode(response.body)['data'];
+      return true;
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
   // {
   // "taskID":"67ac088b-45",
   // "teamMemberID":"2da64477"
@@ -299,7 +322,7 @@ class ApiServices{
       // if user not in the list
       return null;
     } catch (e) {
-      print(e);
+      // print(e);
       throw Exception('Failed to get login request response');
     }
   }
