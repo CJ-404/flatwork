@@ -63,9 +63,18 @@ class _CreateProjectScreenState extends ConsumerState<CreateProjectScreen> {
                       controller: _projectDescriptionController,
                       title: 'Project Description',
                       hintText: 'Project Description',
-                      maxLines: 6,
+                      maxLines: 3,
                     ),
-                    const Gap(60),
+                    const Gap(16),
+                    CommonTextField(
+                      controller: _projectDescriptionController,
+                      title: 'Add project managers',
+                      hintText: 'user email',
+                      maxLines: 1,
+                    ),
+                    Container(
+                      height: 200,
+                    ),
                     ElevatedButton(
                         onPressed: () => _createProject(ref),
                         child: const DisplayWhiteText(
