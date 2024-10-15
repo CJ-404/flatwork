@@ -5,6 +5,7 @@ class RouteLocation{
   const RouteLocation._();
 
   static String get login => '/login';
+  static String get signup => '/signup';
   static String get home => '/home';
   static String get createProject => '/createProject';
   static String get viewProject => '/viewProject/:projectId';

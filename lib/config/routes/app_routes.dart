@@ -1,6 +1,7 @@
 import 'package:flatwork/config/config.dart';
 import 'package:flatwork/screens/login_screen.dart';
 import 'package:flatwork/screens/screens.dart';
+import 'package:flatwork/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,6 +14,12 @@ final appRoutes = [
     name: RouteLocation.login,
     parentNavigatorKey:navigationKey,
     builder: LoginScreen.builder,
+  ),
+  GoRoute(
+    path: RouteLocation.signup,
+    name: RouteLocation.signup,
+    parentNavigatorKey:navigationKey,
+    builder: SignupScreen.builder,
   ),
   GoRoute(
     path: RouteLocation.home,

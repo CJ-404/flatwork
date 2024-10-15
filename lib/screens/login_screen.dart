@@ -26,65 +26,82 @@ class LoginScreen extends ConsumerWidget {
 
     return Scaffold(
       key: _scaffoldKey,
-      body: Stack(
-        children: [
-          Container(
-            height: deviceSize.height,
-            width: deviceSize.width,
-            color: colors.secondary,
-            child: Padding(
-              padding: const EdgeInsets.all(22.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const DisplayWhiteText(
-                      text: 'Welcome',
-                      fontSize: 60
-                  ),
-                  const Gap(50),
-                  TextField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(labelText: 'Email'),
-                  ),
-                  const Gap(30),
-                  TextField(
-                    controller: _passwordController,
-                    decoration: const InputDecoration(labelText: 'Password'),
-                    obscureText: true,
-                  ),
-                  const Gap(20),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final username = _emailController.text;
-                      final password = _passwordController.text;
-                      bool result = await _login(username,password,ref);
-                      if(result)
-                        {
-                          context.pushNamed(RouteLocation.home);
-                        }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colors.onPrimary,
-                      minimumSize: Size(deviceSize.width, 40), // Set the minimum width and height
+      body: SingleChildScrollView(
+        child: Stack(
+          children: [
+            Container(
+              height: deviceSize.height,
+              width: deviceSize.width,
+              color: colors.secondary,
+              child: Padding(
+                padding: const EdgeInsets.all(22.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const DisplayWhiteText(
+                        text: 'Welcome',
+                        fontSize: 60
                     ),
-                    child: const Text(
-                        "login",
-                        style: TextStyle(
-                        fontSize: 16, // Font size
-                        fontWeight: FontWeight.bold, // Font weight
-                        color: Colors.black, // Text color
-                        letterSpacing: 1.2, // Letter spacing
+                    const Gap(50),
+                    TextField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(labelText: 'Email'),
+                    ),
+                    const Gap(30),
+                    TextField(
+                      controller: _passwordController,
+                      decoration: const InputDecoration(labelText: 'Password'),
+                      obscureText: true,
+                    ),
+                    const Gap(20),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final username = _emailController.text;
+                        final password = _passwordController.text;
+                        bool result = await _login(username,password,ref);
+                        if(result)
+                          {
+                            context.pushNamed(RouteLocation.home);
+                          }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colors.onPrimary,
+                        minimumSize: Size(deviceSize.width, 40), // Set the minimum width and height
+                      ),
+                      child: const Text(
+                          "login",
+                          style: TextStyle(
+                          fontSize: 16, // Font size
+                          fontWeight: FontWeight.bold, // Font weight
+                          color: Colors.black, // Text color
+                          letterSpacing: 1.2, // Letter spacing
+                        ),
                       ),
                     ),
-                  ),
-                  if (authState.isAuthenticated)
-                    Text('Logged in as ${_emailController.text}'),
-                ],
+                    const Gap(16),
+                    GestureDetector(
+                      onTap: () {
+                        // Navigate to the signup page
+                        context.pushNamed(RouteLocation.signup);
+                      },
+                      child: const Text(
+                        "Doesn't have an account? Sign Up",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    if (authState.isAuthenticated)
+                      Text('Logged in as ${_emailController.text}'),
+                  ],
+                ),
               ),
             ),
-          ),
-        ]
+          ]
+        ),
       ),
     );
   }
