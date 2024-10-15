@@ -6,6 +6,7 @@ import 'package:flatwork/data/data.dart';
 import 'package:flatwork/providers/providers.dart';
 import 'package:flatwork/services/api_services.dart';
 import 'package:flatwork/utils/utils.dart';
+import 'package:flatwork/widgets/DisplayListOfChats.dart';
 import 'package:flatwork/widgets/display_list_of_shared_files.dart';
 import 'package:flatwork/widgets/main_scaffold.dart';
 import 'package:flatwork/widgets/widgets.dart';
@@ -17,12 +18,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/auth_services.dart';
 import '../widgets/circular_progress_indicator.dart';
 
-class ViewProjectScreen extends ConsumerWidget {
-  static ViewProjectScreen builder(BuildContext context, GoRouterState state , String projectId)
-  => ViewProjectScreen(
+class ChatScreen extends ConsumerWidget {
+  static ChatScreen builder(BuildContext context, GoRouterState state , String projectId)
+  => ChatScreen(
     projectId: projectId,
   );
-  const ViewProjectScreen({
+  const ChatScreen({
     super.key,
     required this.projectId,
   });
@@ -37,106 +38,136 @@ class ViewProjectScreen extends ConsumerWidget {
     final projectState = ref.watch(projectProvider);
     final tasksState = ref.watch(tasksProvider);
 
+    // Dummy list of active chats with new message counts
+    final List<Map<String, dynamic>> activeChats = [
+      {'userName': 'Alice', 'newMessages': 2},
+      {'userName': 'Bob', 'newMessages': 0},
+      {'userName': 'Charlie', 'newMessages': 5},
+      {'userName': 'David', 'newMessages': 1},
+      {'userName': 'Eve', 'newMessages': 0},
+    ];
+
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Implement your function to write a message to a new user
+          // writeNewMessage(context);
+        },
+        backgroundColor: colors.secondary, // Set the background color of the button
+        child: const Icon(
+          Icons.message, // Set the icon for the FAB
+          color: Colors.white, // Set the color of the icon
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: Stack(
         children: [
           projectState.when(
-              data: (projectState) {
-                Project project = projectState;
-                return Column(
-                  children: [
-                    Container(
-                      height: deviceSize.height*0.35,
-                      width: deviceSize.width,
-                      color: colors.secondary,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
-                                onPressed: () {
-                                  ref.read(authProvider.notifier).logout();
-                                  context.pushNamed(RouteLocation.login);
-                                },
-                              ),
-                              PopupMenuButton<String>(
-                                icon: const Icon(
-                                  Icons.more_vert,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                                onSelected: (value) {
-                                  if (value == 'Manage Project Members') {
-                                    context.pushNamed(
-                                      RouteLocation.manageMembers,
-                                      pathParameters: {'projectId': project.id.toString()},
-                                    );
-                                  } else if (value == 'Manage Project Files') {
-                                    showOverlayDialog(context, ref);
-                                  } else if (value == 'Chat with Project Members') {
-                                    context.pushNamed(
-                                      RouteLocation.chat,
-                                      pathParameters: {'projectId': project.id.toString()},
-                                    );
-                                  }
-                                },
-                                itemBuilder: (context) => [
-                                  const PopupMenuItem<String>(
-                                    value: 'Manage Project Members',
-                                    child: Text('Manage Project Members'),
+            data: (projectState) {
+              Project project = projectState;
+              return Column(
+                children: [
+                  Container(
+                    height: deviceSize.height*0.35,
+                    width: deviceSize.width,
+                    color: colors.secondary,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FutureBuilder<String>(
+                          future: AuthServices().getSavedUserRole(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Error: ${snapshot.error}'));
+                              // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
+                              //   return Center(child: Text('User data not found.'));
+                            } else {
+                              final userRole = snapshot.data!;
+                              return
+                              Row(
+                                mainAxisAlignment: (userRole == "manager")? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
+                                    onPressed: () {
+                                      ref.read(authProvider.notifier).logout();
+                                      context.pushNamed(RouteLocation.login);
+                                    },
                                   ),
-                                  const PopupMenuItem<String>(
-                                    value: 'Manage Project Files',
-                                    child: Text('Manage Project Files'),
-                                  ),
-                                  const PopupMenuItem<String>(
-                                    value: 'Chat with Project Members',
-                                    child: Text('Chat with Project Members'),
-                                  ),
+                                  (userRole == "manager")?
+                                    PopupMenuButton<String>(
+                                      icon: const Icon(
+                                        Icons.more_vert,
+                                        color: Colors.white,
+                                        size: 28,
+                                      ),
+                                      onSelected: (value) {
+                                        if (value == 'Manage Project Members') {
+                                          context.pushNamed(
+                                            RouteLocation.manageMembers,
+                                            pathParameters: {'projectId': project.id.toString()},
+                                          );
+                                        } else if (value == 'Manage Project Files') {
+                                          showOverlayDialog(context, ref);
+                                        }
+                                      },
+                                      itemBuilder: (context) => [
+                                        const PopupMenuItem<String>(
+                                          value: 'Manage Project Members',
+                                          child: Text('Manage Project Members'),
+                                        ),
+                                        const PopupMenuItem<String>(
+                                          value: 'Manage Project Files',
+                                          child: Text('Manage Project Files'),
+                                        ),
+                                      ],
+                                    )
+                                      :
+                                      Container()
                                 ],
-                              ),
+                              );
+                            }
+                          },
+                        ),
+                        DisplayWhiteText(
+                            text: project.title,
+                            fontSize: 32
+                        ),
+                        const DisplayWhiteText(
+                            text: 'Instant messaging',
+                            fontSize: 22
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 30.0, top: 0.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              CircularPercentageIndicator(percentage: project.progress),
                             ],
                           ),
-                          DisplayWhiteText(
-                              text: project.title,
-                              fontSize: 32
-                          ),
-                          const DisplayWhiteText(
-                              text: 'Task List',
-                              fontSize: 25
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 30.0, top: 0.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                CircularPercentageIndicator(percentage: project.progress),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                );
-              },
-              error: (error,s) => Text(error.toString()),
-              loading: () =>  const Center(
-                child: CircularProgressIndicator(),
-              ),
+                  ),
+                ],
+              );
+            },
+            error: (error,s) => Text(error.toString()),
+            loading: () =>  const Center(
+              child: CircularProgressIndicator(),
+            ),
           ),
           Positioned(
               top: 200,
               left: 0,
               right: 0,
               child: SafeArea(
-                child: tasksState.when(
-                  data: (tasksState) {
-                    List<Task> tasksList = tasksState.map((e) => e).toList();
+                  child: tasksState.when(
+                    data: (tasksState) {
+                      List<Task> tasksList = tasksState.map((e) => e).toList();
 
                       return SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
@@ -144,53 +175,18 @@ class ViewProjectScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            DisplayListOfTasks(
+                            DisplayListOfChats(
+                              projectId: projectId,
                               tasks: tasksList,
                               ref: ref,
-                            ),
-                            const Gap(20),
-                            FutureBuilder<String>(
-                              future: AuthServices().getSavedUserRole(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const Center(child: CircularProgressIndicator());
-                                } else if (snapshot.hasError) {
-                                  return Center(child: Text('Error: ${snapshot.error}'));
-                                  // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
-                                  //   return Center(child: Text('User data not found.'));
-                                } else {
-                                  final userRole = snapshot.data!;
-                                  return (userRole == "manager")?
-                                  ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: colors.secondary,
-                                      ),
-                                      onPressed: ()
-                                      {
-                                        context.pushNamed(
-                                          RouteLocation.addTask,
-                                          pathParameters: {'projectId':projectId},
-                                        );
-                                      },
-                                      child: const Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: DisplayWhiteText(
-                                          text:'Add new Task',
-                                          fontSize: 20,
-                                        ),
-                                      )
-                                  )
-                                      : Container();
-                                }
-                              },
                             ),
                           ],
                         ),
                       );
-                  },
-                  // TODO: snakBar here
-                  error: (error,s) => Text(error.toString()),
-                  loading: () =>  const Center(
+                    },
+                    // TODO: snakBar here
+                    error: (error,s) => Text(error.toString()),
+                    loading: () =>  const Center(
                       child: CircularProgressIndicator(),
                     ),
                   )

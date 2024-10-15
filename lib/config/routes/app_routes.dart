@@ -1,4 +1,6 @@
 import 'package:flatwork/config/config.dart';
+import 'package:flatwork/screens/chat_screen.dart';
+import 'package:flatwork/screens/inbox_screen.dart';
 import 'package:flatwork/screens/login_screen.dart';
 import 'package:flatwork/screens/project_screen.dart';
 import 'package:flatwork/screens/screens.dart';
@@ -53,6 +55,32 @@ final appRoutes = [
     parentNavigatorKey:navigationKey,
     builder: (context, state) => ViewProjectScreen.builder(
         context, state, state.pathParameters['projectId'] as String),
+  ),
+  GoRoute(
+    path: RouteLocation.manageMembers,
+    name: RouteLocation.manageMembers,
+    parentNavigatorKey:navigationKey,
+    builder: (context, state) => ViewProjectScreen.builder( //TODO: create manage members screen
+        context, state, state.pathParameters['projectId'] as String),
+  ),
+  GoRoute(
+    path: RouteLocation.chat,
+    name: RouteLocation.chat,
+    parentNavigatorKey:navigationKey,
+    builder: (context, state) => ChatScreen.builder(
+        context, state, state.pathParameters['projectId'] as String),
+  ),
+  GoRoute(
+    path: RouteLocation.inbox,
+    name: RouteLocation.inbox,
+    parentNavigatorKey:navigationKey,
+    builder: (context, state) => InboxScreen.builder(
+        context,
+        state,
+        state.pathParameters['projectId'] as String,
+        state.pathParameters['userName'] as String,
+        state.pathParameters['userId'] as String,
+    ),
   ),
   GoRoute(
     path: RouteLocation.editTask,
