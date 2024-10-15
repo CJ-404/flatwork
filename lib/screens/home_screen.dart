@@ -11,7 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   static HomeScreen builder(BuildContext context, GoRouterState state)
-    => const HomeScreen();
+  => const HomeScreen();
   const HomeScreen({super.key});
 
   @override
@@ -31,90 +31,113 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final colors = context.colorScheme;
     final deviceSize = context.deviceSize;
 
-    //TODO: fetch all projects from the backend
-    final projects = ref.watch(projectsProvider);
-
     return MainScaffold(
       child: Scaffold(
-        body: Stack(
-          children: [
-            Column(
-              children: [
-                Container(
-                  height: deviceSize.height*0.3,
-                  width: deviceSize.width,
-                  color: colors.primary,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
-                            onPressed: () {
-                              ref.read(authProvider.notifier).logout();
-                              context.pushNamed(RouteLocation.login);
-                            },
-                          ),
-                        ],
-                      ),
-                      const DisplayWhiteText(
-                          text: 'Welcome',
-                          fontSize: 40
-                      ),
-                      const DisplayWhiteText(
-                          text: 'charith',
-                          fontSize: 25
-                      ),
-                      const Gap(50),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Positioned(
-                top: 130,
-                left: 0,
-                right: 0,
-                child: SafeArea(
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(20),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Column(
+                children: [
+                  Container(
+                    height: deviceSize.height*0.3,
+                    width: deviceSize.width,
+                    color: colors.primary,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        projects.when(
-                            data: (projects) {
-                              List<Project> projectsList = projects.map((e) => e).toList();
-                              return DisplayListOfProjects(
-                                projects: projectsList,
-                                ref: ref,
-                              );
-                            },
-                          //TODO: snakBar here
-                            error: (error,s) => Text(error.toString()),
-                            loading: () =>  const Center(
-                              child: CircularProgressIndicator(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
+                              onPressed: () {
+                                ref.read(authProvider.notifier).logout();
+                                context.pushNamed(RouteLocation.login);
+                              },
                             ),
+                          ],
                         ),
-                        const Gap(20),
-                        ElevatedButton(
-                            onPressed: () => context.push(RouteLocation.createProject),
-                            child: const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: DisplayWhiteText(
-                                text:'Create new Project',
-                                fontSize: 20,
-                              ),
-                            )
-                        )
+                        const DisplayWhiteText(
+                            text: 'Settings',
+                            fontSize: 40
+                        ),
+                        const Gap(50),
                       ],
                     ),
                   ),
-                )
-            ),
-          ],
+                ],
+              ),
+              SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        top: 0,
+                        bottom: 10,
+                        right: 10,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Notifications",
+                                style: context.textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25,
+                                ),
+                              ),
+                              Icon(Icons.notifications,size: 30,),
+                            ],
+                          ),
+                          Divider(),
+                          //notifications
+                          SingleChildScrollView(
+                            child: Container(
+                              //TODO: ad  notification tiles
+                              height: 200,
+                            ),
+                          ),
+
+                          Divider(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Calendar",
+                                style: context.textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25,
+                                ),
+                              ),
+                              Icon(Icons.calendar_today,size: 30,),
+                            ],
+                          ),
+                          Divider(),
+                          // calender
+                          SingleChildScrollView(
+                            //TODO: add a calender
+                            child: Container(
+                              height: 100,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

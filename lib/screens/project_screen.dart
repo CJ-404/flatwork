@@ -15,10 +15,10 @@ class ProjectScreen extends ConsumerStatefulWidget {
   const ProjectScreen({super.key});
 
   @override
-  ConsumerState<ProjectScreen> createState() => _HomeScreenState();
+  ConsumerState<ProjectScreen> createState() => _ProjectScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<ProjectScreen> {
+class _ProjectScreenState extends ConsumerState<ProjectScreen> {
 
   @override
   void didChangeDependencies() {

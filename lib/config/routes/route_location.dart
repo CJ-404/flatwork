@@ -8,6 +8,7 @@ class RouteLocation{
   static String get signup => '/signup';
   static String get home => '/home';
   static String get projects => '/projects';
+  static String get settings => '/settings';
   static String get createProject => '/createProject';
   static String get viewProject => '/viewProject/:projectId';
   static String get editTask => '/editTask/:taskId';

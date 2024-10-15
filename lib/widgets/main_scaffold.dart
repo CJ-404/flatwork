@@ -24,8 +24,8 @@ class MainScaffold extends ConsumerWidget {
         unselectedItemColor: Colors.grey, // Color of the unselected icons and text
         selectedIconTheme: const IconThemeData(size: 30, color: Colors.white), // Size and color of selected icons
         unselectedIconTheme: const IconThemeData(size: 24, color: Colors.grey), // Size and color of unselected icons
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold), // Style for selected labels
-        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal), // Style for unselected labels
+        // selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold), // Style for selected labels
+        // unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal), // Style for unselected labels
         currentIndex: currentIndex,
         onTap: (index) {
           ref.read(bottomNavigationIndexProvider.notifier).state = index;
@@ -37,7 +37,7 @@ class MainScaffold extends ConsumerWidget {
               context.pushNamed(RouteLocation.projects);
               break;
             case 2:
-              context.pushNamed(RouteLocation.home);
+              context.pushNamed(RouteLocation.settings);
               break;
           }
         },

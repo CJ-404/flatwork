@@ -2,6 +2,7 @@ import 'package:flatwork/config/config.dart';
 import 'package:flatwork/screens/login_screen.dart';
 import 'package:flatwork/screens/project_screen.dart';
 import 'package:flatwork/screens/screens.dart';
+import 'package:flatwork/screens/settings_screen.dart';
 import 'package:flatwork/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -33,6 +34,12 @@ final appRoutes = [
     name: RouteLocation.projects,
     parentNavigatorKey:navigationKey,
     builder: ProjectScreen.builder,
+  ),
+  GoRoute(
+    path: RouteLocation.settings,
+    name: RouteLocation.settings,
+    parentNavigatorKey:navigationKey,
+    builder: SettingsScreen.builder,
   ),
   GoRoute(
     path: RouteLocation.createProject,
