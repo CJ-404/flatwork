@@ -24,7 +24,7 @@ class DisplayListOfProjects extends StatelessWidget {
     const emptyProjectsMessage = "There are no projects yet";
 
     return CommonContainer(
-      height: deviceSize.height*0.68,
+      height: deviceSize.height*0.6,
       color: context.colorScheme.onPrimary,
       child: projects.isEmpty?
           Center(
