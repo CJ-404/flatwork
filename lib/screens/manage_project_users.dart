@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart';
 
 import '../services/auth_services.dart';
 import '../widgets/circular_progress_indicator.dart';
@@ -23,12 +24,14 @@ class ManageProjectUsers extends ConsumerWidget {
   => ManageProjectUsers(
     projectId: projectId,
   );
-  const ManageProjectUsers({
+  ManageProjectUsers({
     super.key,
     required this.projectId,
   });
 
   final String projectId;
+
+  final TextEditingController _roleController = TextEditingController(text: "Project Manager");
 
   @override
   Widget build(BuildContext context, ref) {
@@ -40,11 +43,11 @@ class ManageProjectUsers extends ConsumerWidget {
 
     // Dummy list of active chats with new message counts
     final List<Map<String, dynamic>> activeChats = [
-      {'userName': 'Alice', 'newMessages': 2},
-      {'userName': 'Bob', 'newMessages': 0},
-      {'userName': 'Charlie', 'newMessages': 5},
-      {'userName': 'David', 'newMessages': 1},
-      {'userName': 'Eve', 'newMessages': 0},
+      {'userName': 'Alice','userId': '111', 'newMessages': 2},
+      {'userName': 'Bob','userId': '222', 'newMessages': 0},
+      {'userName': 'Charlie','userId': '333' , 'newMessages': 5},
+      {'userName': 'David','userId': '444', 'newMessages': 1},
+      {'userName': 'Eve','userId': '555', 'newMessages': 0},
     ];
 
 
@@ -186,6 +189,7 @@ class ManageProjectUsers extends ConsumerWidget {
                                 itemBuilder: (ctx, index) {
                                   final chat = activeChats[index];
                                   final userName = chat['userName'];
+                                  final userId = chat['userId'];
                                   final newMessages = chat['newMessages'];
 
                                   return ListTile(
@@ -193,12 +197,9 @@ class ManageProjectUsers extends ConsumerWidget {
                                       child: Text(userName[0]), // Show the first letter of the user's name
                                     ),
                                     title: Text(userName),
-                                    trailing: const Icon(
-                                      Icons.delete_outline,
-                                      color: Colors.red,
-                                    ), // Show a badge if there are new messages
+                                    trailing: dotThree(context, ref, projectId, userId), // Show a badge if there are new messages
                                     onTap: () {
-                                      //TODO: remove user from the project
+                                      // do nothing
                                     },
                                   );
                                 }, separatorBuilder: (BuildContext context, int index) {
@@ -240,7 +241,7 @@ class ManageProjectUsers extends ConsumerWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           contentPadding: const EdgeInsets.all(10),
-          title: Text('Select a user to chat with'),
+          title: Text('Select a user'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -280,19 +281,14 @@ class ManageProjectUsers extends ConsumerWidget {
 
                       return ListTile(
                         title: Text(user['name']!),
-                        onTap: () {
-                          // Navigate to the inbox screen of the selected user
-                          Navigator.pop(context); // Close the dialog
-                          //navigate to inbox
-                          context.pushNamed(
-                            RouteLocation.inbox,
-                            pathParameters: {
-                              'projectId': projectId.toString(),
-                              'userName': user['id'].toString(),
-                              'userId': user['name']!.toString(),
-                            },
-                          );
-                        },
+                        trailing: IconButton(onPressed: ()
+                        {
+                          // add the user as a member
+                          Navigator.pop(context);
+                        }
+                        , icon: Icon(Icons.add, color: Colors.black,)),
+                          onTap: () {
+                          },
                       );
                     },
                     separatorBuilder: (BuildContext context, int index) {
@@ -313,4 +309,119 @@ class ManageProjectUsers extends ConsumerWidget {
       },
     );
   }
+
+  Widget dotThree(BuildContext context, WidgetRef ref, String projectId , String userId) {
+      return PopupMenuButton<String>(
+        icon: const Icon(
+          Icons.more_vert,
+          color: Colors.black,
+          size: 28,
+        ),
+        onSelected: (value) {
+          if (value == 'delete') {
+            showDeleteOverlayDialog(context, ref, projectId, userId);
+          } else if (value == 'change role') {
+            showRoleChangeOverlayDialog(context, ref, projectId, userId);
+          }
+        },
+        itemBuilder: (context) => [
+          const PopupMenuItem<String>(
+            value: 'change role',
+            child: Text('Change Role'),
+          ),
+          const PopupMenuItem<String>(
+            value: 'delete',
+            child: Text('Delete'),
+          ),
+        ],
+      );
+    }
+
+  void showRoleChangeOverlayDialog(
+      BuildContext context,WidgetRef ref, String projectId, String userId) {
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Change User Role'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: const Text('Member'),
+                value: 'Member',
+                groupValue: _roleController.text,
+                onChanged: (String? value) {
+                  if (value != null) {
+                    _roleController.text = value;
+                    // Rebuild the dialog to reflect the change.
+                    Navigator.of(context).pop();
+                    showRoleChangeOverlayDialog(context, ref, projectId, userId);
+                  }
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text('Project Manager'),
+                value: 'Project Manager',
+                groupValue: _roleController.text,
+                onChanged: (String? value) {
+                  if (value != null) {
+                    _roleController.text = value;
+                    // Rebuild the dialog to reflect the change.
+                    Navigator.of(context).pop();
+                    showRoleChangeOverlayDialog(context, ref, projectId, userId);
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // TODO: Add save logic here.
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showDeleteOverlayDialog(
+      BuildContext context, WidgetRef ref, String projectId, String userId) {
+    const String dummyUserName = 'John Doe'; // Replace with actual user name if available.
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Remove User'),
+          content: Text('Are you sure you want to remove $dummyUserName from the project?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // TODO: Add delete logic here.
+                Navigator.pop(context);
+              },
+              child: const Text('Remove'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
+
+
