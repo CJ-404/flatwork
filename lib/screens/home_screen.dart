@@ -3,11 +3,13 @@ import 'package:flatwork/data/data.dart';
 import 'package:flatwork/providers/providers.dart';
 import 'package:flatwork/utils/utils.dart';
 import 'package:flatwork/widgets/main_scaffold.dart';
+import 'package:flatwork/widgets/notification_tile.dart';
 import 'package:flatwork/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   static HomeScreen builder(BuildContext context, GoRouterState state)
@@ -30,6 +32,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final colors = context.colorScheme;
     final deviceSize = context.deviceSize;
+    final today = DateTime.now();
 
     return MainScaffold(
       child: Scaffold(
@@ -58,7 +61,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ],
                         ),
                         const DisplayWhiteText(
-                            text: 'Settings',
+                            text: 'Welcome',
                             fontSize: 40
                         ),
                         const Gap(50),
@@ -67,74 +70,91 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 16,
-                        top: 0,
-                        bottom: 10,
-                        right: 10,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Notifications",
-                                style: context.textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25,
-                                ),
-                              ),
-                              Icon(Icons.notifications,size: 30,),
-                            ],
-                          ),
-                          Divider(),
-                          //notifications
-                          SingleChildScrollView(
-                            child: Container(
-                              //TODO: ad  notification tiles
-                              height: 200,
-                            ),
-                          ),
-
-                          Divider(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Calendar",
-                                style: context.textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25,
-                                ),
-                              ),
-                              Icon(Icons.calendar_today,size: 30,),
-                            ],
-                          ),
-                          Divider(),
-                          // calender
-                          SingleChildScrollView(
-                            //TODO: add a calender
-                            child: Container(
-                              height: 100,
-                            ),
-                          ),
-                        ],
-                      ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 15,
+                      top: 15,
+                      bottom: 10,
+                      right: 15,
                     ),
-                  ],
-                ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Notifications",
+                              style: context.textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25,
+                              ),
+                            ),
+                            Icon(Icons.notifications,size: 30,),
+                          ],
+                        ),
+                        Divider(),
+                        //notifications
+                        SingleChildScrollView(
+                          child: Expanded(
+                            // height: 200,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                NotificationTile(message: "You have a task due on nov 2",),
+                                NotificationTile(message: "You have a task due on nov 4",),
+                                NotificationTile(message: "New project invitation. check your email",),
+                                NotificationTile(message: "New messages - project flatpack ",),
+                              ]
+                              //TODO: add  notification tiles
+
+                            ),
+                          ),
+                        ),
+
+                        Divider(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Calendar",
+                              style: context.textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25,
+                              ),
+                            ),
+                            Icon(Icons.calendar_today,size: 30,),
+                          ],
+                        ),
+                        Divider(),
+                        // calender
+                        SingleChildScrollView(
+                          physics: const NeverScrollableScrollPhysics(),
+                          //TODO: add a calender
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              TableCalendar(
+                                  focusedDay: today,
+                                  firstDay: DateTime.utc(2020, 1, 1),
+                                  lastDay: DateTime.utc(2030, 12, 31),
+                                  headerStyle: HeaderStyle(formatButtonVisible: false, titleCentered: true),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
