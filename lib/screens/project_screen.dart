@@ -9,16 +9,16 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
-  static HomeScreen builder(BuildContext context, GoRouterState state)
-    => const HomeScreen();
-  const HomeScreen({super.key});
+class ProjectScreen extends ConsumerStatefulWidget {
+  static ProjectScreen builder(BuildContext context, GoRouterState state)
+  => const ProjectScreen();
+  const ProjectScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<ProjectScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<ProjectScreen> {
 
   @override
   void didChangeDependencies() {
@@ -60,12 +60,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ],
                       ),
                       const DisplayWhiteText(
-                          text: 'Welcome',
+                          text: 'Project List',
                           fontSize: 40
-                      ),
-                      const DisplayWhiteText(
-                          text: 'charith',
-                          fontSize: 25
                       ),
                       const Gap(50),
                     ],
@@ -85,18 +81,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         projects.when(
-                            data: (projects) {
-                              List<Project> projectsList = projects.map((e) => e).toList();
-                              return DisplayListOfProjects(
-                                projects: projectsList,
-                                ref: ref,
-                              );
-                            },
+                          data: (projects) {
+                            List<Project> projectsList = projects.map((e) => e).toList();
+                            return DisplayListOfProjects(
+                              projects: projectsList,
+                              ref: ref,
+                            );
+                          },
                           //TODO: snakBar here
-                            error: (error,s) => Text(error.toString()),
-                            loading: () =>  const Center(
-                              child: CircularProgressIndicator(),
-                            ),
+                          error: (error,s) => Text(error.toString()),
+                          loading: () =>  const Center(
+                            child: CircularProgressIndicator(),
+                          ),
                         ),
                         const Gap(20),
                         ElevatedButton(

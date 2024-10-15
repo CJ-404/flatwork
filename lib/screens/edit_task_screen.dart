@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flatwork/data/data.dart';
 import 'package:flatwork/services/auth_services.dart';
 import 'package:flatwork/utils/utils.dart';
+import 'package:flatwork/widgets/main_scaffold.dart';
 import 'package:flatwork/widgets/progress_bar_with_labels.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -30,151 +31,153 @@ class EditTaskScreen extends ConsumerWidget {
     return fetchedTask.when(
       data: (fetchedTask){
         Task task = fetchedTask;
-        return Scaffold(
-          key: scaffoldKey,
-          appBar: AppBar(
-            backgroundColor: Colors.cyan,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                DisplayWhiteText(text: task.title, fontSize: 20,),
-                IconButton(
-                  icon: Icon(Icons.edit_document, color: colors.onPrimary,size: 30,),
-                  onPressed: () {
-                    showOverlayDialog(context, ref);
-                  },
-                ),
-              ],
+        return MainScaffold(
+          child: Scaffold(
+            key: scaffoldKey,
+            appBar: AppBar(
+              backgroundColor: Colors.cyan,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  DisplayWhiteText(text: task.title, fontSize: 20,),
+                  IconButton(
+                    icon: Icon(Icons.edit_document, color: colors.onPrimary,size: 30,),
+                    onPressed: () {
+                      showOverlayDialog(context, ref);
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(20.0),
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  left: 16,
-                  top: 10,
-                  bottom: 10,
-                  right: 10,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Task description",
-                      style: context.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 25,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(20.0),
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    top: 10,
+                    bottom: 10,
+                    right: 10,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Task description",
+                        style: context.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25,
+                        ),
                       ),
-                    ),
-                    const Divider(
-                      thickness: 1,
-                      color: Colors.black,
-                    ),
-                    Text(
-                            task.description,
-                            style: context.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18,
+                      const Divider(
+                        thickness: 1,
+                        color: Colors.black,
+                      ),
+                      Text(
+                              task.description,
+                              style: context.textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18,
+                              ),
                             ),
-                          ),
-                    const Gap(30),
-                    Text(
-                      "Progress",
-                      style: context.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 25,
+                      const Gap(30),
+                      Text(
+                        "Progress",
+                        style: context.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25,
+                        ),
                       ),
-                    ),
-                    const Divider(
-                      thickness: 1,
-                      color: Colors.black,
-                    ),
-                    Text(
-                      "Make sure to update your task progress so that project managers can view task status",
-                      style: context.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 18,
+                      const Divider(
+                        thickness: 1,
+                        color: Colors.black,
                       ),
-                    ),
-                    const Gap(20),
-                    Center(
-                      child: Text(
-                        "$progressValue%",
+                      Text(
+                        "Make sure to update your task progress so that project managers can view task status",
                         style: context.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w500,
                           fontSize: 18,
                         ),
                       ),
-                    ),
-                    ProgressBarWithLabels(taskId:taskId),
-                    const Gap(30),
-                    Text(
-                      "Assigned User",
-                      style: context.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 25,
+                      const Gap(20),
+                      Center(
+                        child: Text(
+                          "$progressValue%",
+                          style: context.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18,
+                          ),
+                        ),
                       ),
-                    ),
-                    const Divider(
-                      thickness: 1,
-                      color: Colors.black,
-                    ),
-                    SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                DisplayListOfUsers(
-                                  assignedUsers: task.assignedUser == null? [] : [task.assignedUser!],
-                                  scaffoldKey: scaffoldKey,
-                                ),
-                                const Gap(20),
-                                FutureBuilder<String>(
-                                  future: AuthServices().getSavedUserRole(),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState == ConnectionState.waiting) {
-                                      return const Center(child: CircularProgressIndicator());
-                                    } else if (snapshot.hasError) {
-                                      return Center(child: Text('Error: ${snapshot.error}'));
-                                      // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
-                                      //   return Center(child: Text('User data not found.'));
-                                    } else {
-                                      final userRole = snapshot.data!;
-                                      return (userRole == "manager")?
-                                      ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.cyan,
-                                          ),
-                                          onPressed: () async {
-                                            ref.read(userFilterProvider.notifier).state = "";
-                                            await showModalBottomSheet(
-                                              // showDragHandle: true,
-                                              context: context,
-                                              builder: (ctx) {
-                                                return SelectTeamMember(assignedMembers: task.assignedUser==null? []:[task.assignedUser!],scaffoldKey: scaffoldKey,);
-                                              },
-                                            );
-                                          },
-                                          child: const Padding(
-                                            padding: EdgeInsets.all(8.0),
-                                            child: DisplayWhiteText(
-                                              text:'Assign a team member',
-                                              fontSize: 20,
+                      ProgressBarWithLabels(taskId:taskId),
+                      const Gap(30),
+                      Text(
+                        "Assigned User",
+                        style: context.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25,
+                        ),
+                      ),
+                      const Divider(
+                        thickness: 1,
+                        color: Colors.black,
+                      ),
+                      SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  DisplayListOfUsers(
+                                    assignedUsers: task.assignedUser == null? [] : [task.assignedUser!],
+                                    scaffoldKey: scaffoldKey,
+                                  ),
+                                  const Gap(20),
+                                  FutureBuilder<String>(
+                                    future: AuthServices().getSavedUserRole(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return const Center(child: CircularProgressIndicator());
+                                      } else if (snapshot.hasError) {
+                                        return Center(child: Text('Error: ${snapshot.error}'));
+                                        // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
+                                        //   return Center(child: Text('User data not found.'));
+                                      } else {
+                                        final userRole = snapshot.data!;
+                                        return (userRole == "manager")?
+                                        ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.cyan,
                                             ),
-                                          )
-                                      )
-                                          : Container();
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                    ),
-                  ],
+                                            onPressed: () async {
+                                              ref.read(userFilterProvider.notifier).state = "";
+                                              await showModalBottomSheet(
+                                                // showDragHandle: true,
+                                                context: context,
+                                                builder: (ctx) {
+                                                  return SelectTeamMember(assignedMembers: task.assignedUser==null? []:[task.assignedUser!],scaffoldKey: scaffoldKey,);
+                                                },
+                                              );
+                                            },
+                                            child: const Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: DisplayWhiteText(
+                                                text:'Assign a team member',
+                                                fontSize: 20,
+                                              ),
+                                            )
+                                        )
+                                            : Container();
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

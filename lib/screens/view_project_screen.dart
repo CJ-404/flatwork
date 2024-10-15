@@ -7,6 +7,7 @@ import 'package:flatwork/providers/providers.dart';
 import 'package:flatwork/services/api_services.dart';
 import 'package:flatwork/utils/utils.dart';
 import 'package:flatwork/widgets/display_list_of_shared_files.dart';
+import 'package:flatwork/widgets/main_scaffold.dart';
 import 'package:flatwork/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -37,138 +38,140 @@ class ViewProjectScreen extends ConsumerWidget {
     final tasksState = ref.watch(tasksProvider);
 
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          projectState.when(
-              data: (projectState) {
-                Project project = projectState;
-                return Column(
-                  children: [
-                    Container(
-                      height: deviceSize.height*0.35,
-                      width: deviceSize.width,
-                      color: colors.secondary,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 30.0, top: 0.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                IconButton(
-                                  icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
-                                  onPressed: () {
-                                    ref.read(authProvider.notifier).logout();
-                                    context.pushNamed(RouteLocation.login);
-                                  },
-                                ),
-                                CircularPercentageIndicator(percentage: project.progress),
-                              ],
-                            ),
-                          ),
-                          DisplayWhiteText(
-                              text: project.title,
-                              fontSize: 32
-                          ),
-                          const DisplayWhiteText(
-                              text: 'Task List',
-                              fontSize: 25
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(right: 15.0),
-                                child: IconButton(
-                                  icon: Icon(Icons.edit_document, color: colors.onPrimary,size: 35,),
-                                  onPressed: () {
-                                    showOverlayDialog(context, ref);
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              },
-              error: (error,s) => Text(error.toString()),
-              loading: () =>  const Center(
-                child: CircularProgressIndicator(),
-              ),
-          ),
-          Positioned(
-              top: 200,
-              left: 0,
-              right: 0,
-              child: SafeArea(
-                child: tasksState.when(
-                  data: (tasksState) {
-                    List<Task> tasksList = tasksState.map((e) => e).toList();
-
-                      return SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(20),
+    return MainScaffold(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            projectState.when(
+                data: (projectState) {
+                  Project project = projectState;
+                  return Column(
+                    children: [
+                      Container(
+                        height: deviceSize.height*0.35,
+                        width: deviceSize.width,
+                        color: colors.secondary,
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            DisplayListOfTasks(
-                              tasks: tasksList,
-                              ref: ref,
+                            Padding(
+                              padding: const EdgeInsets.only(right: 30.0, top: 0.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
+                                    onPressed: () {
+                                      ref.read(authProvider.notifier).logout();
+                                      context.pushNamed(RouteLocation.login);
+                                    },
+                                  ),
+                                  CircularPercentageIndicator(percentage: project.progress),
+                                ],
+                              ),
                             ),
-                            const Gap(20),
-                            FutureBuilder<String>(
-                              future: AuthServices().getSavedUserRole(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const Center(child: CircularProgressIndicator());
-                                } else if (snapshot.hasError) {
-                                  return Center(child: Text('Error: ${snapshot.error}'));
-                                  // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
-                                  //   return Center(child: Text('User data not found.'));
-                                } else {
-                                  final userRole = snapshot.data!;
-                                  return (userRole == "manager")?
-                                  ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: colors.secondary,
-                                      ),
-                                      onPressed: ()
-                                      {
-                                        context.pushNamed(
-                                          RouteLocation.addTask,
-                                          pathParameters: {'projectId':projectId},
-                                        );
-                                      },
-                                      child: const Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: DisplayWhiteText(
-                                          text:'Add new Task',
-                                          fontSize: 20,
-                                        ),
-                                      )
-                                  )
-                                      : Container();
-                                }
-                              },
+                            DisplayWhiteText(
+                                text: project.title,
+                                fontSize: 32
+                            ),
+                            const DisplayWhiteText(
+                                text: 'Task List',
+                                fontSize: 25
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 15.0),
+                                  child: IconButton(
+                                    icon: Icon(Icons.edit_document, color: colors.onPrimary,size: 35,),
+                                    onPressed: () {
+                                      showOverlayDialog(context, ref);
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      );
-                  },
-                  // TODO: snakBar here
-                  error: (error,s) => Text(error.toString()),
-                  loading: () =>  const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-              )
-          ),
-        ],
+                      ),
+                    ],
+                  );
+                },
+                error: (error,s) => Text(error.toString()),
+                loading: () =>  const Center(
+                  child: CircularProgressIndicator(),
+                ),
+            ),
+            Positioned(
+                top: 200,
+                left: 0,
+                right: 0,
+                child: SafeArea(
+                  child: tasksState.when(
+                    data: (tasksState) {
+                      List<Task> tasksList = tasksState.map((e) => e).toList();
+      
+                        return SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              DisplayListOfTasks(
+                                tasks: tasksList,
+                                ref: ref,
+                              ),
+                              const Gap(20),
+                              FutureBuilder<String>(
+                                future: AuthServices().getSavedUserRole(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return const Center(child: CircularProgressIndicator());
+                                  } else if (snapshot.hasError) {
+                                    return Center(child: Text('Error: ${snapshot.error}'));
+                                    // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
+                                    //   return Center(child: Text('User data not found.'));
+                                  } else {
+                                    final userRole = snapshot.data!;
+                                    return (userRole == "manager")?
+                                    ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: colors.secondary,
+                                        ),
+                                        onPressed: ()
+                                        {
+                                          context.pushNamed(
+                                            RouteLocation.addTask,
+                                            pathParameters: {'projectId':projectId},
+                                          );
+                                        },
+                                        child: const Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: DisplayWhiteText(
+                                            text:'Add new Task',
+                                            fontSize: 20,
+                                          ),
+                                        )
+                                    )
+                                        : Container();
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                    },
+                    // TODO: snakBar here
+                    error: (error,s) => Text(error.toString()),
+                    loading: () =>  const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                )
+            ),
+          ],
+        ),
       ),
     );
   }

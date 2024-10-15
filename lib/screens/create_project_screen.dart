@@ -2,6 +2,7 @@ import 'package:flatwork/data/data.dart';
 import 'package:flatwork/providers/loading_provider.dart';
 import 'package:flatwork/providers/project/project.dart';
 import 'package:flatwork/services/api_services.dart';
+import 'package:flatwork/widgets/main_scaffold.dart';
 import 'package:flatwork/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -34,46 +35,48 @@ class _CreateProjectScreenState extends ConsumerState<CreateProjectScreen> {
   Widget build(BuildContext context) {
     final loading = ref.watch(loadingProvider);
 
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: const DisplayWhiteText(text: "Create new Project", fontSize: 20,),
-      ),
-      body: SafeArea(
-        child: loading?
-            const Center(
-              child: CircularProgressIndicator(),
-            )
-              :
-            SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  CommonTextField(
-                    controller: _projectTitleController,
-                    title: 'Project Title',
-                    hintText: 'Project Title',
-                  ),
-                  const Gap(16),
-                  CommonTextField(
-                    controller: _projectDescriptionController,
-                    title: 'Project Description',
-                    hintText: 'Project Description',
-                    maxLines: 6,
-                  ),
-                  const Gap(60),
-                  ElevatedButton(
-                      onPressed: () => _createProject(ref),
-                      child: const DisplayWhiteText(
-                        text: 'Save',
-                        fontSize: 20,
-                      )
-                  )
-                ],
+    return MainScaffold(
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          title: const DisplayWhiteText(text: "Create new Project", fontSize: 20,),
+        ),
+        body: SafeArea(
+          child: loading?
+              const Center(
+                child: CircularProgressIndicator(),
+              )
+                :
+              SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    CommonTextField(
+                      controller: _projectTitleController,
+                      title: 'Project Title',
+                      hintText: 'Project Title',
+                    ),
+                    const Gap(16),
+                    CommonTextField(
+                      controller: _projectDescriptionController,
+                      title: 'Project Description',
+                      hintText: 'Project Description',
+                      maxLines: 6,
+                    ),
+                    const Gap(60),
+                    ElevatedButton(
+                        onPressed: () => _createProject(ref),
+                        child: const DisplayWhiteText(
+                          text: 'Save',
+                          fontSize: 20,
+                        )
+                    )
+                  ],
+                ),
               ),
-            ),
+        ),
       ),
     );
   }
