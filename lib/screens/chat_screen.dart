@@ -52,7 +52,8 @@ class ChatScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Implement your function to write a message to a new user
-          // writeNewMessage(context);
+          // TODO: dialog to select a new user to chat with
+          showOverlayDialog(context,ref);
         },
         backgroundColor: colors.secondary, // Set the background color of the button
         child: const Icon(
@@ -197,195 +198,142 @@ class ChatScreen extends ConsumerWidget {
     );
   }
 
-  void _getPermissionOverlay(BuildContext context, WidgetRef ref, FilePickerResult pickedFile) async {
-    final userRole = await AuthServices().getSavedUserRole();
-    final colors = context.colorScheme;
-    final selectedFile = pickedFile.files.first;
+  void showOverlayDialog(BuildContext context, WidgetRef ref) async {
+    final deviceSize = context.deviceSize;
+    TextEditingController searchController = TextEditingController();
+    List<Map<String, String>> users = [
+      {'id': '1', 'name': 'Alice'},
+      {'id': '2', 'name': 'Bob'},
+      {'id': '3', 'name': 'Charlie'},
+      {'id': '4', 'name': 'David'},
+      {'id': '5', 'name': 'Eve'},
+    ];
+    List<Map<String, String>> filteredUsers = List.from(users);
+
     showDialog(
       context: context,
-      barrierDismissible: false, // dismiss when tapping outside
       builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          elevation: 16,
-          child: Container(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'upload',
-                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+        return AlertDialog(
+          contentPadding: const EdgeInsets.all(10),
+          title: Text('Select a user to chat with'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Search Input Field
+              TextField(
+                controller: searchController,
+                onChanged: (value) {
+                  // Update the filtered users based on the search query
+                  filteredUsers = users
+                      .where((user) =>
+                      user['name']!
+                          .toLowerCase()
+                          .contains(value.toLowerCase()))
+                      .toList();
+                  // ref.read(_dummyStateProvider.state).state++;
+                },
+                decoration: InputDecoration(
+                  hintText: 'Search user name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 5, horizontal: 10),
                 ),
-                const Divider(thickness: 1.5,),
-                Text(
-                  'Are you sure you want to upload ${selectedFile.name}?',
-                  style: const TextStyle(fontSize: 16.0,),
-                ),
-                const Gap(20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () async {
-                        try{
-                          // upload file to the firebase
-                          final uploadedUrl = await FileManager().uploadFile(pickedFile, 'shared_files/project/');
-                          print('upload Url : $uploadedUrl');
+              ),
+              const SizedBox(height: 10),
+              // List of Users
+              Expanded(
+                child: CommonContainer(
+                    height: deviceSize.height*0.4,
+                    color: context.colorScheme.onPrimary,
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: filteredUsers.length,
+                    itemBuilder: (ctx, index) {
+                      final user = filteredUsers[index];
 
-                          // send link to the backend
-                          // if not created, exception will pop
-                          final created = await ApiServices().createProjectFile(projectId, pickedFile.files.first.name, uploadedUrl);
-                          // TODO: refresh getting shared files ref
-                          // for now just pop from context to load again by taping
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                // mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text("file uploaded!"),
-                                  SizedBox(width: 10),
-                                  Icon(Icons.check_box_outlined, color: Colors.black54),
-                                ],
-                              ),
-                              backgroundColor: Colors.green,
-                            ),
+                      return ListTile(
+                        title: Text(user['name']!),
+                        onTap: () {
+                          // Navigate to the inbox screen of the selected user
+                          Navigator.pop(context); // Close the dialog
+                          //navigate to inbox
+                          context.pushNamed(
+                            RouteLocation.inbox,
+                            pathParameters: {
+                              'projectId': projectId.toString(),
+                              'userName': user['id'].toString(),
+                              'userId': user['name']!.toString(),
+                            },
                           );
-                        }
-                        catch (e){
-                          print('error: $e');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                // mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text("file not uploaded! error occurred"),
-                                  SizedBox(width: 10),
-                                  Icon( Icons.error_outline_rounded , color: Colors.black54),
-                                ],
-                              ),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                        Navigator.of(context).pop(); // Close the dialog
-                      },
-                      child: const Text('Upload'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        // remove selected file
-                        Navigator.of(context).pop(); // Close the dialog
-                      },
-                      child: const Text('Cancel'),
-                    ),
-                  ],
+                        },
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const Divider(thickness: 1.0,);
+                    },
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
         );
       },
     );
   }
-
-  void showOverlayDialog(BuildContext context, WidgetRef ref) async {
-    final userRole = await AuthServices().getSavedUserRole();
-    try{
-      final files = await ApiServices().getProjectFiles(projectId);
-      final fileLinks = files.map((file) => file.url).toList();
-      // print(fileLinks);
-
-      final colors = context.colorScheme;
-      showDialog(
-        context: context,
-        barrierDismissible: true, // dismiss when tapping outside
-        builder: (BuildContext context) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            elevation: 16,
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  (userRole == "manager")?
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Shared project files',
-                        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.add, color: colors.primary,size: 30,),
-                        onPressed: () async {
-                          FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
-                            type: FileType.custom,
-                            allowedExtensions: ['pdf','pptx','doc','docx'], // TODO: add more required types
-                          );
-                          if (pickedFile == null) return;
-                          // File file = File(result.files.single.path!);
-                          // final selectedFile = result.files.first;
-                          Navigator.of(context).pop();
-                          _getPermissionOverlay(context, ref, pickedFile);
-                        },
-                      ),
-                    ],
-                  )
-                      :
-                  const Text(
-                    'Shared project files',
-                    style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                  ),
-                  const Divider(thickness: 1.5,),
-                  //list of shared files
-                  SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    // padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        DisplayListOfSharedFiles(
-                            sharedFileLinks:
-                            fileLinks,
-                            ref: ref),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      );
-    }
-    catch (e) {
-      print(e);
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            // mainAxisSize: MainAxisSize.min,
-            children: [
-              Text("Check your connection!"),
-              SizedBox(width: 10),
-              Icon( Icons.error_outline_rounded , color: Colors.black54),
-            ],
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-  }
 }
+
+// class DisplayListUsersToChatWith extends StatelessWidget {
+//   const DisplayListUsersToChatWith({
+//     super.key,
+//     required this.projectId,
+//     required this.filteredUsers
+//   });
+//
+//   final String projectId;
+//   final  List<Map<String, String>> filteredUsers;
+//
+//   // TODO: fetch file names for links from firebase
+//   // late List<String> sharedFilesNames;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final deviceSize = context.deviceSize;
+//     const emptyTasksMessage = "empty";
+//
+//     return ListView.separated(
+//       shrinkWrap: true,
+//       itemCount: filteredUsers.length,
+//       itemBuilder: (ctx, index) {
+//         final user = filteredUsers[index];
+//
+//         return ListTile(
+//           title: Text(user['name']!),
+//           onTap: () {
+//             // Navigate to the inbox screen of the selected user
+//             Navigator.pop(context); // Close the dialog
+//             //navigate to inbox
+//             context.pushNamed(
+//               RouteLocation.inbox,
+//               pathParameters: {
+//                 'projectId': projectId.toString(),
+//                 'userName': user['id'].toString(),
+//                 'userId': user['name']!.toString(),
+//               },
+//             );
+//           },
+//         );
+//       },
+//       separatorBuilder: (BuildContext context, int index) {
+//         return const Divider(thickness: 1.0,);
+//       },
+//     );
+//   }
+// }
