@@ -2,6 +2,7 @@ import 'package:flatwork/config/config.dart';
 import 'package:flatwork/screens/chat_screen.dart';
 import 'package:flatwork/screens/inbox_screen.dart';
 import 'package:flatwork/screens/login_screen.dart';
+import 'package:flatwork/screens/manage_project_users.dart';
 import 'package:flatwork/screens/project_screen.dart';
 import 'package:flatwork/screens/screens.dart';
 import 'package:flatwork/screens/settings_screen.dart';
@@ -60,7 +61,7 @@ final appRoutes = [
     path: RouteLocation.manageMembers,
     name: RouteLocation.manageMembers,
     parentNavigatorKey:navigationKey,
-    builder: (context, state) => ViewProjectScreen.builder( //TODO: create manage members screen
+    builder: (context, state) => ManageProjectUsers.builder( //TODO: create manage members screen
         context, state, state.pathParameters['projectId'] as String),
   ),
   GoRoute(
