@@ -20,7 +20,7 @@ class AppTheme {
     swapColors: true,
     lightIsWhite: true,
     visualDensity: FlexColorScheme.comfortablePlatformDensity,
-    fontFamily: GoogleFonts.dekko().fontFamily,
+    // fontFamily: GoogleFonts.dekko().fontFamily,
     subThemesData: const FlexSubThemesData(
       useTextTheme: true,
       fabUseShape: true,

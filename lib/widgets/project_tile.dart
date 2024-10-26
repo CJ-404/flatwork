@@ -2,6 +2,7 @@ import 'package:flatwork/data/data.dart';
 import 'package:flatwork/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProjectTile extends StatelessWidget {
   const ProjectTile({super.key, required this.project});
@@ -23,15 +24,14 @@ class ProjectTile extends StatelessWidget {
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Text(
-              project.title,
-              style: context.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 25,
-              ),
+          Text(
+            project.title,
+            style: context.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 25,
+              fontFamily: GoogleFonts.akatab().fontFamily,
             ),
           ),
           const Gap(5),

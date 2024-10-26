@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gap/gap.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flatwork/utils/utils.dart';
 
 class CreateProjectScreen extends ConsumerStatefulWidget {
   static CreateProjectScreen builder(BuildContext context, GoRouterState state)
@@ -34,58 +35,75 @@ class _CreateProjectScreenState extends ConsumerState<CreateProjectScreen> {
   @override
   Widget build(BuildContext context) {
     final loading = ref.watch(loadingProvider);
+    final colors = context.colorScheme;
+    final deviceSize = context.deviceSize;
 
-    return MainScaffold(
+    return SafeArea(
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
           title: const DisplayWhiteText(text: "Create new Project", fontSize: 20,),
         ),
-        body: SafeArea(
-          child: loading?
-              const Center(
-                child: CircularProgressIndicator(),
-              )
-                :
-              SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    CommonTextField(
-                      controller: _projectTitleController,
-                      title: 'Project Title',
-                      hintText: 'Project Title',
-                    ),
-                    const Gap(16),
-                    CommonTextField(
-                      controller: _projectDescriptionController,
-                      title: 'Project Description',
-                      hintText: 'Project Description',
-                      maxLines: 3,
-                    ),
-                    const Gap(16),
-                    CommonTextField(
-                      controller: _projectDescriptionController,
-                      title: 'Add project managers',
-                      hintText: 'user email',
-                      maxLines: 1,
-                    ),
-                    Container(
-                      height: 200,
-                    ),
-                    ElevatedButton(
-                        onPressed: () => _createProject(ref),
-                        child: const DisplayWhiteText(
-                          text: 'Save',
-                          fontSize: 20,
-                        )
-                    )
-                  ],
+        body: loading?
+            const Center(
+              child: CircularProgressIndicator(),
+            )
+              :
+            SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: deviceSize.height * 0.85,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          CommonTextField(
+                            controller: _projectTitleController,
+                            title: 'Project Title',
+                            hintText: 'Project Title',
+                          ),
+                          const Gap(16),
+                          CommonTextField(
+                            controller: _projectDescriptionController,
+                            title: 'Project Description',
+                            hintText: 'Project Description',
+                            maxLines: 3,
+                          ),
+                          const Gap(16),
+                          CommonTextField(
+                            controller: _projectDescriptionController,
+                            title: 'Add project managers',
+                            hintText: 'user email',
+                            maxLines: 1,
+                          ),
+                          // Container(
+                          //   height: 300,
+                          // ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          ElevatedButton(
+                              onPressed: () => _createProject(ref),
+                              child: const DisplayWhiteText(
+                                text: 'Save',
+                                fontSize: 20,
+                              )
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-        ),
+            ),
       ),
     );
   }

@@ -35,54 +35,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final today = DateTime.now();
 
     return MainScaffold(
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Column(
-                children: [
-                  Container(
-                    height: deviceSize.height*0.3,
-                    width: deviceSize.width,
-                    color: colors.primary,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
-                              onPressed: () {
-                                ref.read(authProvider.notifier).logout();
-                                context.pushNamed(RouteLocation.login);
-                              },
-                            ),
-                          ],
-                        ),
-                        const DisplayWhiteText(
-                            text: 'Welcome',
-                            fontSize: 40
-                        ),
-                        const Gap(50),
-                      ],
-                    ),
+      child: CustomScrollView(
+        slivers: [
+          // Collapsible Notifications section
+            SliverAppBar(
+              pinned: true,
+              floating: true,
+              expandedHeight: 300.0,
+              backgroundColor: Colors.white,
+              flexibleSpace: FlexibleSpaceBar(
+                background : Container(
+                  margin: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 15,
-                      top: 15,
-                      bottom: 10,
-                      right: 15,
-                    ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -98,68 +76,132 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             Icon(Icons.notifications,size: 30,),
                           ],
                         ),
-                        Divider(),
+                        Divider(thickness: 2),
                         //notifications
-                        SingleChildScrollView(
-                          child: Expanded(
-                            // height: 200,
+                        Expanded(
+                          child: SingleChildScrollView(
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                NotificationTile(message: "You have a task due on nov 2",),
-                                NotificationTile(message: "You have a task due on nov 4",),
-                                NotificationTile(message: "New project invitation. check your email",),
-                                NotificationTile(message: "New messages - project flatpack ",),
-                              ]
-                              //TODO: add  notification tiles
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  NotificationTile(message: "You have a task due on nov 2",),
+                                  NotificationTile(message: "You have a task due on nov 4",),
+                                  NotificationTile(message: "New project invitation!",),
+                                  // NotificationTile(message: "New messages - project flatpack ",),
+                                ]
 
                             ),
-                          ),
-                        ),
-
-                        Divider(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Calendar",
-                              style: context.textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25,
-                              ),
-                            ),
-                            Icon(Icons.calendar_today,size: 30,),
-                          ],
-                        ),
-                        Divider(),
-                        // calender
-                        SingleChildScrollView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          //TODO: add a calender
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              TableCalendar(
-                                  focusedDay: today,
-                                  firstDay: DateTime.utc(2020, 1, 1),
-                                  lastDay: DateTime.utc(2030, 12, 31),
-                                  headerStyle: HeaderStyle(formatButtonVisible: false, titleCentered: true),
-                              )
-                            ],
-                          ),
+                          )
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
-            ],
-          ),
+            ),
+            // Calendar section that takes the remaining space
+            SliverToBoxAdapter (
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+              
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Calendar",
+                            style: context.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 25,
+                            ),
+                          ),
+                          Icon(Icons.calendar_today,size: 30,),
+                        ],
+                      ),
+                      Divider(thickness: 2),
+                      // calender
+                      TableCalendar(
+                          focusedDay: today,
+                          firstDay: DateTime.utc(2020, 1, 1),
+                          lastDay: DateTime.utc(2030, 12, 31),
+                          headerStyle: HeaderStyle(formatButtonVisible: false, titleCentered: true),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Calendar Events section
+            SliverToBoxAdapter(
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title Row with Icon for Calendar Events
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text(
+                            'Calendar Events',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          Icon(Icons.event),
+                        ],
+                      ),
+                    ),
+                    const Divider(),
+                    // Calendar Events Content
+                    Container(
+                      height: 300, // Adjust as needed for demo purposes
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: List.generate(
+                              10,
+                                  (index) => ListTile(
+                                title: Text('Event $index'),
+                              )),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
-    );
+      );
   }
 }

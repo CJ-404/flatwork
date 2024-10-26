@@ -33,7 +33,7 @@ class NotificationTile extends StatelessWidget {
                 Text(
                   message,
                   style: style.titleMedium?.copyWith(
-                    fontSize: 18,
+                    fontSize: 17,
                   ),
                 ),
                 // Text(

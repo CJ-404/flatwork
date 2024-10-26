@@ -21,7 +21,7 @@ class InboxScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
-    final receiverName = "Bob";
+    final receiverName = "David";
     // Dummy messages list
     final List<Map<String, dynamic>> messages = [
       {

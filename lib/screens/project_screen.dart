@@ -36,82 +36,89 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen> {
 
     return MainScaffold(
       child: Scaffold(
-        body: Stack(
-          children: [
-            Column(
-              children: [
-                Container(
-                  height: deviceSize.height*0.3,
-                  width: deviceSize.width,
-                  color: colors.primary,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+        body: CustomScrollView (
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                floating: true,
+                expandedHeight: deviceSize.height*0.28,
+                backgroundColor: Colors.white,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
-                            onPressed: () {
-                              ref.read(authProvider.notifier).logout();
-                              context.pushNamed(RouteLocation.login);
-                            },
-                          ),
-                        ],
+                      Container(
+                        height: deviceSize.height*0.28,
+                        width: deviceSize.width,
+                        color: colors.primary,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.start,
+                            //   children: [
+                            //     IconButton(
+                            //       icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
+                            //       onPressed: () {
+                            //         ref.read(authProvider.notifier).logout();
+                            //         context.pushNamed(RouteLocation.login);
+                            //       },
+                            //     ),
+                            //   ],
+                            // ),
+                            const DisplayWhiteText(
+                                text: 'Project List',
+                                fontSize: 40
+                            ),
+                            // const Gap(50),
+                          ],
+                        ),
                       ),
-                      const DisplayWhiteText(
-                          text: 'Project List',
-                          fontSize: 40
-                      ),
-                      const Gap(50),
                     ],
                   ),
                 ),
-              ],
-            ),
-            Positioned(
-                top: 130,
-                left: 0,
-                right: 0,
-                child: SafeArea(
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        projects.when(
-                          data: (projects) {
-                            List<Project> projectsList = projects.map((e) => e).toList();
-                            return DisplayListOfProjects(
-                              projects: projectsList,
-                              ref: ref,
-                            );
-                          },
-                          //TODO: snakBar here
-                          error: (error,s) => Text(error.toString()),
-                          loading: () =>  const Center(
-                            child: CircularProgressIndicator(),
-                          ),
+              ),
+                // section that takes the remaining space
+              SliverToBoxAdapter(
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      projects.when(
+                        data: (projects) {
+                          List<Project> projectsList = projects.map((e) => e).toList();
+                          return DisplayListOfProjects(
+                            projects: projectsList,
+                            ref: ref,
+                          );
+                        },
+                        //TODO: snakBar here
+                        error: (error,s) => Text(error.toString()),
+                        loading: () =>  const Center(
+                          child: CircularProgressIndicator(),
                         ),
-                        const Gap(20),
-                        ElevatedButton(
-                            onPressed: () => context.push(RouteLocation.createProject),
-                            child: const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: DisplayWhiteText(
-                                text:'Create new Project',
-                                fontSize: 20,
-                              ),
-                            )
-                        )
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                )
-            ),
-          ],
+                ),
+              ),
+            ],
         ),
+        floatingActionButton: SizedBox(
+          width: deviceSize.width * 0.9,
+          child: ElevatedButton(
+              onPressed: () => context.push(RouteLocation.createProject),
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: DisplayWhiteText(
+                  text:'Create new Project',
+                  fontSize: 20,
+                ),
+              )
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }
