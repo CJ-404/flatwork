@@ -1,5 +1,6 @@
 import 'package:flatwork/config/config.dart';
 import 'package:flatwork/screens/chat_screen.dart';
+import 'package:flatwork/screens/edit_profile.dart';
 import 'package:flatwork/screens/inbox_screen.dart';
 import 'package:flatwork/screens/login_screen.dart';
 import 'package:flatwork/screens/manage_project_users.dart';
@@ -43,6 +44,12 @@ final appRoutes = [
     name: RouteLocation.settings,
     parentNavigatorKey:navigationKey,
     builder: SettingsScreen.builder,
+  ),
+  GoRoute(
+    path: RouteLocation.editProfile,
+    name: RouteLocation.editProfile,
+    parentNavigatorKey:navigationKey,
+    builder: EditProfile.builder,
   ),
   GoRoute(
     path: RouteLocation.createProject,

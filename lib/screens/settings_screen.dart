@@ -41,27 +41,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   height: deviceSize.height*0.3,
                   width: deviceSize.width,
                   color: colors.primary,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
-                            onPressed: () {
-                              ref.read(authProvider.notifier).logout();
-                              context.pushNamed(RouteLocation.login);
-                            },
-                          ),
-                        ],
-                      ),
-                      const DisplayWhiteText(
-                          text: 'Settings',
-                          fontSize: 40
-                      ),
-                      const Gap(50),
-                    ],
+                  child: Center(
+                    child: const DisplayWhiteText(
+                        text: 'Settings',
+                        fontSize: 40
+                    ),
                   ),
                 ),
               ],
@@ -74,7 +58,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   InkWell(
                     onTap: (){
-                      // TODO: go to change profile settings screen
+                      context.pushNamed(RouteLocation.editProfile);
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(

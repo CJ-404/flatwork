@@ -36,7 +36,7 @@ class DisplayListOfTasks extends StatelessWidget {
           } else {
             final userRole = snapshot.data!;
             return CommonContainer(
-              height: (userRole == "manager")? deviceSize.height * 0.56 : deviceSize.height * 0.68,
+              height: (userRole == "manager")? deviceSize.height * 0.6 : deviceSize.height * 0.68,
               color: context.colorScheme.onPrimary,
               child: tasks.isEmpty ?
               Center(

@@ -9,6 +9,7 @@ class RouteLocation{
   static String get home => '/home';
   static String get projects => '/projects';
   static String get settings => '/settings';
+  static String get editProfile => '/edit_profile';
   static String get createProject => '/createProject';
   static String get viewProject => '/viewProject/:projectId';
   static String get manageMembers => '/manageMembers/:projectId';

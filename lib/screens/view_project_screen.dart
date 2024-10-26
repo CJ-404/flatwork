@@ -148,42 +148,6 @@ class ViewProjectScreen extends ConsumerWidget {
                               tasks: tasksList,
                               ref: ref,
                             ),
-                            const Gap(20),
-                            FutureBuilder<String>(
-                              future: AuthServices().getSavedUserRole(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const Center(child: CircularProgressIndicator());
-                                } else if (snapshot.hasError) {
-                                  return Center(child: Text('Error: ${snapshot.error}'));
-                                  // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
-                                  //   return Center(child: Text('User data not found.'));
-                                } else {
-                                  final userRole = snapshot.data!;
-                                  return (userRole == "manager")?
-                                  ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: colors.secondary,
-                                      ),
-                                      onPressed: ()
-                                      {
-                                        context.pushNamed(
-                                          RouteLocation.addTask,
-                                          pathParameters: {'projectId':projectId},
-                                        );
-                                      },
-                                      child: const Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: DisplayWhiteText(
-                                          text:'Add new Task',
-                                          fontSize: 20,
-                                        ),
-                                      )
-                                  )
-                                      : Container();
-                                }
-                              },
-                            ),
                           ],
                         ),
                       );
@@ -198,6 +162,45 @@ class ViewProjectScreen extends ConsumerWidget {
           ),
         ],
       ),
+      floatingActionButton: SizedBox(
+        width: deviceSize.width * 0.9,
+        child: FutureBuilder<String>(
+          future: AuthServices().getSavedUserRole(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+              // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
+              //   return Center(child: Text('User data not found.'));
+            } else {
+              final userRole = snapshot.data!;
+              return (userRole == "manager")?
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colors.secondary,
+                  ),
+                  onPressed: ()
+                  {
+                    context.pushNamed(
+                      RouteLocation.addTask,
+                      pathParameters: {'projectId':projectId},
+                    );
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: DisplayWhiteText(
+                      text:'Add new Task',
+                      fontSize: 20,
+                    ),
+                  )
+              )
+                  : Container();
+            }
+          },
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
