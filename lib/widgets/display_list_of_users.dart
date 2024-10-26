@@ -37,10 +37,10 @@ class DisplayListOfUsers extends ConsumerWidget {
           } else {
             final userRole = snapshot.data!;
             return CommonContainer(
-              height: (userRole == "manager")? isSelect! ?
-                      deviceSize.height * 0.25 : deviceSize.height * 0.25
-                  :
-                      isSelect! ? deviceSize.height * 0.3 : deviceSize.height * 0.46,
+              // height: (userRole == "manager")? isSelect! ?
+              //         deviceSize.height * 0.25 : deviceSize.height * 0.25
+              //     :
+              //         isSelect! ? deviceSize.height * 0.3 : deviceSize.height * 0.46,
               color: context.colorScheme.onPrimary,
               child: assignedUsers.isEmpty ?
               Center(
