@@ -40,9 +40,10 @@ class ManageProjectUsers extends ConsumerWidget {
     // final projectIdState = ref.watch(projectIdProvider);
     final projectState = ref.watch(projectProvider);
     final tasksState = ref.watch(tasksProvider);
+    final scaffoldKey = GlobalKey<ScaffoldState>();
 
     // Dummy list of active chats with new message counts
-    final List<Map<String, dynamic>> activeChats = [
+    final List<Map<String, dynamic>> projectUsers = [
       {'userName': 'Alice','userId': '111', 'newMessages': 2},
       {'userName': 'Bob','userId': '222', 'newMessages': 0},
       {'userName': 'Charlie','userId': '333' , 'newMessages': 5},
@@ -53,10 +54,17 @@ class ManageProjectUsers extends ConsumerWidget {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           // Implement your function to write a message to a new user
           // TODO: dialog to select a new user to add to the project
-          showOverlayDialog(context,ref);
+          showOverlayDialog(context,ref, projectUsers);
+          // await showModalBottomSheet(
+          //   // showDragHandle: true,
+          //   context: context,
+          //   builder: (ctx) {
+          //     return SelectTeamMember(assignedMembers: [] ,scaffoldKey: scaffoldKey,);
+          //   },
+          // );
         },
         backgroundColor: colors.secondary, // Set the background color of the button
         child: const Icon(
@@ -92,7 +100,7 @@ class ManageProjectUsers extends ConsumerWidget {
                               final userRole = snapshot.data!;
                               return
                                 Row(
-                                  mainAxisAlignment: (userRole == "manager")? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
+                                  mainAxisAlignment: (userRole == "manager" || userRole == "OWNER")? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
                                   children: [
                                     IconButton(
                                       icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
@@ -101,7 +109,7 @@ class ManageProjectUsers extends ConsumerWidget {
                                         context.pushNamed(RouteLocation.login);
                                       },
                                     ),
-                                    (userRole == "manager")?
+                                    (userRole == "manager" || userRole == "OWNER")?
                                     PopupMenuButton<String>(
                                       icon: const Icon(
                                         Icons.more_vert,
@@ -110,7 +118,8 @@ class ManageProjectUsers extends ConsumerWidget {
                                       ),
                                       onSelected: (value) {
                                         if (value == 'Manage Project Files') {
-                                          showOverlayDialog(context, ref);
+                                          // TODO: open manage files overlay
+                                          // showOverlayDialog(context, ref, []);
                                         } else if (value == 'Chat with Project Members') {
                                           context.pushNamed(
                                             RouteLocation.chat,
@@ -185,18 +194,34 @@ class ManageProjectUsers extends ConsumerWidget {
                               child:
                               ListView.separated(
                                 shrinkWrap: true,
-                                itemCount: activeChats.length,
+                                itemCount: projectUsers.length,
                                 itemBuilder: (ctx, index) {
-                                  final chat = activeChats[index];
-                                  final userName = chat['userName'];
-                                  final userId = chat['userId'];
-                                  final newMessages = chat['newMessages'];
+                                  final user = projectUsers[index];
+                                  final userName = user['userName'];
+                                  final userId = user['userId'];
 
                                   return ListTile(
                                     leading: CircleAvatar(
                                       child: Text(userName[0]), // Show the first letter of the user's name
                                     ),
-                                    title: Text(userName),
+                                    title: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text.rich(TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: userName,
+                                            ),
+                                            TextSpan(
+                                              text: " (user@gmail.com)",
+                                              style: TextStyle(color: Colors.grey.shade700),
+                                            )
+                                          ]
+                                        )),
+                                        Text("role", style: TextStyle(color: Colors.grey),),
+                                      ],
+                                    ),
                                     trailing: dotThree(context, ref, projectId, userId), // Show a badge if there are new messages
                                     onTap: () {
                                       // do nothing
@@ -224,17 +249,9 @@ class ManageProjectUsers extends ConsumerWidget {
     );
   }
 
-  void showOverlayDialog(BuildContext context, WidgetRef ref) async {
+  void showOverlayDialog(BuildContext context, WidgetRef ref, List<Map<String, dynamic>> projectUsers) async {
     final deviceSize = context.deviceSize;
     TextEditingController searchController = TextEditingController();
-    List<Map<String, String>> users = [
-      {'id': '1', 'name': 'Alice'},
-      {'id': '2', 'name': 'Bob'},
-      {'id': '3', 'name': 'Charlie'},
-      {'id': '4', 'name': 'David'},
-      {'id': '5', 'name': 'Eve'},
-    ];
-    List<Map<String, String>> filteredUsers = List.from(users);
 
     showDialog(
       context: context,
@@ -249,14 +266,8 @@ class ManageProjectUsers extends ConsumerWidget {
               TextField(
                 controller: searchController,
                 onChanged: (value) {
-                  // Update the filtered users based on the search query
-                  filteredUsers = users
-                      .where((user) =>
-                      user['name']!
-                          .toLowerCase()
-                          .contains(value.toLowerCase()))
-                      .toList();
-                  // ref.read(_dummyStateProvider.state).state++;
+                  // update user list based on search input
+                  ref.read(AllUserListProvider.notifier).filterAllUsers(value);
                 },
                 decoration: InputDecoration(
                   hintText: 'Search user email',
@@ -273,28 +284,48 @@ class ManageProjectUsers extends ConsumerWidget {
                 child: CommonContainer(
                   height: deviceSize.height*0.4,
                   color: context.colorScheme.onPrimary,
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: filteredUsers.length,
-                    itemBuilder: (ctx, index) {
-                      final user = filteredUsers[index];
+                  child: Consumer(
+                      builder: (context, ref, child) {
+                        final filteredUsers = ref.watch(AllUserListProvider);
+                        
+                        return (searchController.text == "")?
+                            Center(
+                              child: Text("start typing to see users"),
+                            )
+                        :
+                        (filteredUsers.isEmpty)?
+                          Center(
+                            child: Text("Not found! Check again"),
+                          )
+                        :
+                        ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: filteredUsers.length,
+                          itemBuilder: (ctx, index) {
+                            final user = filteredUsers[index];
 
-                      return ListTile(
-                        title: Text(user['name']!),
-                        trailing: IconButton(onPressed: ()
-                        {
-                          // add the user as a member
-                          Navigator.pop(context);
-                        }
-                        , icon: Icon(Icons.add, color: Colors.black,)),
-                          onTap: () {
+                            return ListTile(
+                              title: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(user['name']!),
+                                  Text(user['email']!, style: TextStyle(color: Colors.grey),),
+                                ],
+                              ),
+                              onTap: () {
+                                // TODO: add the user as a member
+                                Navigator.pop(context);
+                              },
+                              enabled: !projectUsers.any((projectUser) => projectUser['userId'] == user['userId']),
+                            );
                           },
-                      );
-                    },
-                    separatorBuilder: (BuildContext context, int index) {
-                      return const Divider(thickness: 1.0,);
-                    },
-                  ),
+                          separatorBuilder: (BuildContext context, int index) {
+                            return const Divider(thickness: 1.0,);
+                          },
+                        );
+                      }
+                    ),
                 ),
               ),
             ],
