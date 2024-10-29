@@ -40,11 +40,11 @@ final projectUserListProvider = StateNotifierProvider.autoDispose<ProjectUserLis
 
 class ProjectUserListNotifier extends StateNotifier<List<Map<String, String>>> {
   final List<Map<String, String>> _allProjectUsers = [
-    {'userId': '111', 'name': 'Alice', 'email': 'qwe'},
-    {'userId': '2', 'name': 'Bob', 'email': 'wer'},
-    {'userId': '3', 'name': 'Charlie', 'email': 'ert'},
-    {'userId': '4', 'name': 'David', 'email': 'sdf'},
-    {'userId': '5', 'name': 'Eve', 'email': 'tyu'},
+    {'userId': '111', 'name': 'AAlice', 'email': 'qwe'},
+    {'userId': '2', 'name': 'BBob', 'email': 'wer'},
+    {'userId': '3', 'name': 'CCharlie', 'email': 'ert'},
+    {'userId': '4', 'name': 'DDavid', 'email': 'sdf'},
+    {'userId': '5', 'name': 'EEve', 'email': 'tyu'},
   ];
 
   ProjectUserListNotifier() : super([]) {
@@ -56,7 +56,7 @@ class ProjectUserListNotifier extends StateNotifier<List<Map<String, String>>> {
   void filterProjectUsers(String query) {
     if (query.isEmpty) {
       // If query is empty, reset to the empty set
-      state = [];
+      state = _allProjectUsers;
     } else {
       // Filter the list based on the query
       state = _allProjectUsers
