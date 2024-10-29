@@ -38,6 +38,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           // Persist token
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('authToken', accessToken);
+          await prefs.setString('userId', user.id);
           await prefs.setString('firstName', user.firstName);
           await prefs.setString('lastName', user.lastName);
           await prefs.setString('email', user.email);
@@ -55,6 +56,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     // Remove token from shared preferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('authToken');
+    await prefs.remove('userId');
     await prefs.remove('firstName');
     await prefs.remove('lastName');
     await prefs.remove('email');

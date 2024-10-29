@@ -88,6 +88,7 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen> {
                       projects.when(
                         data: (projects) {
                           List<Project> projectsList = projects.map((e) => e).toList();
+                          print(projectsList);
                           return DisplayListOfProjects(
                             projects: projectsList,
                             ref: ref,

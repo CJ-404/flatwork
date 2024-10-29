@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flatwork/services/auth_services.dart';
 import 'package:http/http.dart';
 import 'package:flatwork/data/data.dart';
 
@@ -15,7 +16,9 @@ class ApiServices{
   static String accessToken = "";
 
   Future<List<Project>> getProjects() async {
-    final url = Uri.parse("$endpoint/project/get_all_projects");
+
+    final userId = await AuthServices().getSavedUserId();
+    final url = Uri.parse("$endpoint/project/get_all_projects_by_userID?userID=$userId");
     Response response = await get(
       url,
       headers: {
@@ -27,6 +30,7 @@ class ApiServices{
     ;
     if (response.statusCode == 200){
       final List result = jsonDecode(response.body)['data'];
+      print(result);
       return result.map(((e) => Project.fromJson(e))).toList();
     }
     else {
@@ -185,11 +189,15 @@ class ApiServices{
   // "project_description":"test_project_description"
   // }
   Future<bool> createProject(Project project) async {
+
     final url = Uri.parse("$endpoint/project/initialize_project");
+    final userId = await AuthServices().getSavedUserId();
     final body =  jsonEncode({
+      "userID": userId,
       "project_name": project.title,
       "project_description":project.description,
     });
+
     Response response = await post(
         url,
         headers: {

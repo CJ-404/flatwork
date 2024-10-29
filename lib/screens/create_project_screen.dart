@@ -75,13 +75,6 @@ class _CreateProjectScreenState extends ConsumerState<CreateProjectScreen> {
                             hintText: 'Project Description',
                             maxLines: 3,
                           ),
-                          const Gap(16),
-                          CommonTextField(
-                            controller: _projectDescriptionController,
-                            title: 'Add project managers',
-                            hintText: 'user email',
-                            maxLines: 1,
-                          ),
                           // Container(
                           //   height: 300,
                           // ),
@@ -133,7 +126,7 @@ class _CreateProjectScreenState extends ConsumerState<CreateProjectScreen> {
 
     ref.read(loadingProvider.notifier).state = true;
     try{
-      final response = await ApiServices().createProject(Project(title: title, description: description, progress: 0.0));
+      final response = await ApiServices().createProject(Project(title: title, description: description, progress: 0.0, role: 'Owner'));
       if(response){
         ref.read(loadingProvider.notifier).state = false;
         if(_scaffoldKey.currentState != null) {

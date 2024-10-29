@@ -10,13 +10,14 @@ class AuthServices{
     final lastName = prefs.getString('lastName');
     final email = prefs.getString('email');
     final role = prefs.getString('role');
-
+    final userId = prefs.getString('userId');
     return {
       'token': token,
       'firstName': firstName,
       'lastName': lastName,
       'email': email,
       'role': role,
+      'userId': userId,
     };
   }
 
@@ -26,6 +27,13 @@ class AuthServices{
     final lastName = prefs.getString('lastName');
 
     return "${firstName!} ${lastName!}";
+  }
+
+  Future<String> getSavedUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+
+    return userId!;
   }
 
   Future<String> getSavedUserRole() async {
