@@ -1,3 +1,4 @@
+import 'package:flatwork/services/auth_services.dart';
 import 'package:flatwork/utils/utils.dart';
 import 'package:flatwork/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,7 @@ class DisplayListOfProjects extends StatelessWidget {
               },
               onTap: () {
                 ref.read(projectIdProvider.notifier).state = project.id.toString();
+                AuthServices().setProjectRole(project.role?? "USER");
                 context.pushNamed(
                   RouteLocation.viewProject,
                   pathParameters: {'projectId': project.id.toString()},

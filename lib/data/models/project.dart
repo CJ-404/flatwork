@@ -7,7 +7,7 @@ class Project extends Equatable {
   final String title;
   final String description;
   final double progress;
-  final String role;
+  final String? role;
   // final String time;
   // final String date;
   // final bool completed;
@@ -17,7 +17,7 @@ class Project extends Equatable {
     required this.title,
     required this.description,
     required this.progress,
-    required this.role,
+    this.role,
     // required this.time,
     // required this.date
   });
@@ -29,6 +29,16 @@ class Project extends Equatable {
       description: json['projectDescription'] ?? "",
       progress: json['projectProgressStatus'] ?? 0.0,
       role: json['role'],
+    );
+  }
+
+  factory Project.projectFromJson(Map<String, dynamic> json){
+    return Project(
+      id: json['project_id'],
+      title: json['project_name'],
+      description: json['project_description'] ?? "",
+      progress: json['projectProgressStatus'] ?? 0.0,
+      role: json['role']?? "",
     );
   }
 

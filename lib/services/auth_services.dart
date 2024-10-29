@@ -21,6 +21,17 @@ class AuthServices{
     };
   }
 
+  Future<void> setProjectRole(String newRole) async {
+    try {
+
+      // Persist token
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('role', newRole);
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future<String> getSavedUserName() async {
     final prefs = await SharedPreferences.getInstance();
     final firstName = prefs.getString('firstName');

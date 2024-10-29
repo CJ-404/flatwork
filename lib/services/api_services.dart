@@ -30,7 +30,7 @@ class ApiServices{
     ;
     if (response.statusCode == 200){
       final List result = jsonDecode(response.body)['data'];
-      print(result);
+      // print(result);
       return result.map(((e) => Project.fromJson(e))).toList();
     }
     else {
@@ -50,7 +50,7 @@ class ApiServices{
     );
     if (response.statusCode == 200){
       final result = jsonDecode(response.body)['data'];
-      return Project.fromJson(result);
+      return Project.projectFromJson(result);
     }
     else {
       throw Exception(response.reasonPhrase);

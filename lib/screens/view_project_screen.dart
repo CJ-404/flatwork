@@ -44,6 +44,7 @@ class ViewProjectScreen extends ConsumerWidget {
           projectState.when(
               data: (projectState) {
                 Project project = projectState;
+                print(project);
                 return Column(
                   children: [
                     Container(
@@ -175,7 +176,7 @@ class ViewProjectScreen extends ConsumerWidget {
               //   return Center(child: Text('User data not found.'));
             } else {
               final userRole = snapshot.data!;
-              return (userRole == "manager")?
+              return (userRole == "Manager" || userRole == "OWNER")?
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colors.secondary,
@@ -324,7 +325,7 @@ class ViewProjectScreen extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  (userRole == "manager")?
+                  (userRole == "manager" || userRole == "OWNER")?
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
