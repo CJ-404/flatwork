@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flatwork/config/config.dart';
 import 'package:flatwork/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flatwork/widgets/widgets.dart';
 
+import '../data/models/user.dart';
 import '../services/api_services.dart';
 
 class LoginScreen extends ConsumerWidget {
@@ -132,8 +135,15 @@ class LoginScreen extends ConsumerWidget {
       try{
         final response = await ApiServices().login(email, password);
         if(response != null){
+
+          final result = response['res'];
+          final Map<String, dynamic> jsonResponse = jsonDecode(result.body);
+          final loggedUser = User.fromJson(jsonResponse['data']);
+
+          final accessToken = response['access_token'];
+
           ref.read(loadingProvider.notifier).state = false;
-          ref.read(authProvider.notifier).login(response);
+          ref.read(authProvider.notifier).login(loggedUser, accessToken);
           if(_scaffoldKey.currentState != null) {
             ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(
               const SnackBar(

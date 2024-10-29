@@ -6,11 +6,25 @@ class ApiServices{
   // use 10.0.2.2 if running using the emulator
 
   // use your server machine ip address when mobile and server connected to the same network
+
+  // debian ip in local WIFI
+  // String endpoint = "http://192.168.1.39:8080/mpma/api/v1";
+
+  // windows ip in local WIFI
   String endpoint = "http://192.168.1.3:8080/mpma/api/v1";
+  static String accessToken = "";
 
   Future<List<Project>> getProjects() async {
     final url = Uri.parse("$endpoint/project/get_all_projects");
-    Response response = await get(url);
+    Response response = await get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+    )
+    ;
     if (response.statusCode == 200){
       final List result = jsonDecode(response.body)['data'];
       return result.map(((e) => Project.fromJson(e))).toList();
@@ -22,7 +36,14 @@ class ApiServices{
 
   Future<Project> getProject(String projectId) async {
     final url = Uri.parse("$endpoint/project/get_project_by_project_id?projectID=$projectId");
-    Response response = await get(url);
+    Response response = await get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+    );
     if (response.statusCode == 200){
       final result = jsonDecode(response.body)['data'];
       return Project.fromJson(result);
@@ -34,7 +55,14 @@ class ApiServices{
 
   Future<List<File>> getProjectFiles(String projectId) async {
     final url = Uri.parse("$endpoint/file/getProjectFile?projectID=$projectId");
-    Response response = await get(url);
+    Response response = await get(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+          "Authorization": "Bearer $accessToken",
+        },
+    );
     if (response.statusCode == 200){
       final List result = jsonDecode(response.body)['data'];
       return result.map(((data) => File.fromJson(data))).toList();
@@ -46,7 +74,14 @@ class ApiServices{
 
   Future<List<Task>> getTasks(String projectId) async {
     final url = Uri.parse("$endpoint/task/get_all_tasks_by_project_id?projectID=$projectId");
-    Response response = await get(url);
+    Response response = await get(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+          "Authorization": "Bearer $accessToken",
+        },
+    );
     if (response.statusCode == 200){
       final List result = jsonDecode(response.body)['data'];
       return result.map(((e) => Task.fromJson(e))).toList();
@@ -58,7 +93,14 @@ class ApiServices{
 
   Future<List<File>> getTaskFiles(String taskId) async {
     final url = Uri.parse("$endpoint/file/getTaskFile?taskId=$taskId");
-    Response response = await get(url);
+    Response response = await get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+    );
     if (response.statusCode == 200){
       final List result = jsonDecode(response.body)['data'];
       return result.map(((data) => File.fromJson(data))).toList();
@@ -70,7 +112,14 @@ class ApiServices{
 
   Future<Task> getTask(String taskId) async {
     final url = Uri.parse("$endpoint/task/get_task_by_id?taskID=$taskId");
-    Response response = await get(url);
+    Response response = await get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+    );
     if (response.statusCode == 200){
       final result = jsonDecode(response.body)['data'];
       return Task.fromJson(result);
@@ -82,7 +131,14 @@ class ApiServices{
 
   Future<List<User>> getUsers() async {
     final url = Uri.parse("$endpoint/user/get_all_team_members");
-    Response response = await get(url);
+    Response response = await get(
+        url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+    );
     if (response.statusCode == 200){
       final List result = jsonDecode(response.body)['data'];
       return result.map(((e) => User.fromJson(e))).toList();
@@ -95,7 +151,14 @@ class ApiServices{
   // Ignore for now
   Future<User> getUser(String userId) async {
     final url = Uri.parse("user/$endpoint?userID=$userId");
-    Response response = await get(url);
+    Response response = await get(
+        url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+    );
     if (response.statusCode == 200){
       final result = jsonDecode(response.body)['data'];
       return User.fromJson(result);
@@ -132,6 +195,7 @@ class ApiServices{
         headers: {
           "Content-Type": "application/json",
           "Accept": "*/*",
+          "Authorization": "Bearer $accessToken",
         },
         body: body
     );
@@ -156,6 +220,7 @@ class ApiServices{
         headers: {
           "Content-Type": "application/json",
           "Accept": "*/*",
+          "Authorization": "Bearer $accessToken",
         },
         body: body
     );
@@ -185,6 +250,7 @@ class ApiServices{
         headers: {
           "Content-Type": "application/json",
           "Accept": "*/*",
+          "Authorization": "Bearer $accessToken",
         },
         body: body
     );
@@ -209,6 +275,7 @@ class ApiServices{
         headers: {
           "Content-Type": "application/json",
           "Accept": "*/*",
+          "Authorization": "Bearer $accessToken",
         },
         body: body
     );
@@ -232,6 +299,7 @@ class ApiServices{
         headers: {
           "Content-Type": "application/json",
           "Accept": "*/*",
+          "Authorization": "Bearer $accessToken",
         },
         body: body
     );
@@ -259,6 +327,7 @@ class ApiServices{
         headers: {
           "Content-Type": "application/json",
           "Accept": "*/*",
+          "Authorization": "Bearer $accessToken",
         },
         body: body
     );
@@ -286,6 +355,7 @@ class ApiServices{
         headers: {
           "Content-Type": "application/json",
           "Accept": "*/*",
+          "Authorization": "Bearer $accessToken",
         },
         body: body
     );
@@ -298,32 +368,101 @@ class ApiServices{
     }
   }
 
-  Future<User?> login(String email, String password) async {
+  Future<Map<String, dynamic>?> login(String email, String password) async {
+
     try {
-      // final response = await http.post(
-      //   Uri.parse('https://yourapi.com/login'),
-      //   headers: {'Content-Type': 'application/json'},
-      //   body: jsonEncode({'username': username, 'password': password}),
-      // );
+      final url = Uri.parse("$endpoint/user/login");
+      final body =  jsonEncode({
+        'email': email,
+        'password': password
+      });
 
-      final List<User> dummyUsers = [
-        const User(firstName: "danusha", lastName: "thilakerathne", email: "danushaThilake@gmail.com",role: "worker"),
-        const User(firstName: "nilusha", lastName: "dissanayake", email: "nilushads@gmail.com",role: "manager"),
-        const User(firstName: "charith", lastName: "jayarangana", email: "charithjayarangana@gmail.com",role: "manager"),
-        const User(firstName: "sandaruwan", lastName: "sandakelum", email: "sandaruwans@gmail.com",role: "worker"),
-      ];
+      Response response1 = await post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+        },
+        body: body
+      );
+      Response response2;
 
-      for (User user in dummyUsers) {
-        if (user.email == email) {
-          return user;
+      if (response1.statusCode == 200){
+
+        final Map<String, dynamic> jsonResponse = jsonDecode(response1.body)['data'];
+
+        final String userId = jsonResponse['user_id'];
+        accessToken = jsonResponse['access_token'];
+
+        // Print each data item
+        // print('User ID: $userId');
+        // print('Access Token: $accessToken');
+
+        final url = Uri.parse("$endpoint/user/get_user_by_userID?userID=$userId");
+        response2 = await get(
+            url,
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "*/*",
+              "Authorization": "Bearer $accessToken",
+            },
+        );
+
+        if (response2.statusCode == 200) {
+
+          // final Map<String, dynamic> jsonResponse = jsonDecode(response2.body);
+          // final user = User.fromJson(jsonResponse['data']);
+
+          final Map<String, dynamic> result = {
+            'res' : response2,
+            'access_token' : accessToken,
+          };
+
+          return result;
+        }
+        else {
+          throw Exception(response2.reasonPhrase);
         }
       }
+      else {
+        throw Exception(response1.reasonPhrase);
+      }
 
-      // if user not in the list
-      return null;
     } catch (e) {
       // print(e);
       throw Exception('Failed to get login request response');
+    }
+  }
+
+  Future<bool?> signup(String fname, String lname, String email, String password, String contactNo) async {
+    try {
+
+      final url = Uri.parse("$endpoint/user/user_sign_up");
+      final body =  jsonEncode({
+        "first_name": fname,
+        "last_name": lname,
+        "email": email,
+        "contact":contactNo,
+        "password": password,
+      });
+      Response response = await post(
+          url,
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "*/*",
+          },
+          body: body
+      );
+      if (response.statusCode == 201){
+        return true;
+      }
+      else {
+        throw Exception(response.reasonPhrase);
+      }
+
+    } catch (e) {
+      // print(e);
+      throw Exception('Failed to get signup request response');
     }
   }
 }

@@ -31,7 +31,7 @@ class Task extends Equatable {
     User? assigned = (json['name'] == "null null" || json['user_Id'] == null)?
     null
         :
-    User(id: json['user_Id'] ,firstName: json['name'], lastName: "", email: "");
+    User(id: json['user_Id'] ,firstName: json['name'], lastName: "", email: "", contact: "");
 
     return Task(
       id: json['task_Id'],

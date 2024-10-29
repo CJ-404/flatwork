@@ -5,8 +5,8 @@ class User extends Equatable {
   final String firstName;
   final String lastName;
   final String email;
-  final String? role; //TODO: role should be  required field
-  // final String contact;
+  final String? role;
+  final String contact;
 
   const User( {
     this.id,
@@ -14,7 +14,7 @@ class User extends Equatable {
     required this.lastName,
     required this.email,
     this.role,
-    // required this.contact,
+    required this.contact,
   });
 
   factory User.fromJson(Map<String, dynamic> json){
@@ -23,7 +23,7 @@ class User extends Equatable {
       firstName: json['first_name'],
       lastName: json['last_name'],
       email: json['email'],
-      // contact: json['contact'],
+      contact: json['contact'],
     );
   }
 
@@ -43,7 +43,7 @@ class User extends Equatable {
       firstName,
       lastName,
       email,
-      // contact,
+      contact,
     ];
   }
 

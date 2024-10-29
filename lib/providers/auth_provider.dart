@@ -27,19 +27,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
     _loadAuthToken();
   }
 
-  Future<void> login(User user) async {
+  Future<void> login(User user, String accessToken) async {
     try {
-          String token = "exmple_token_112232e45353";
+          // print("${user.firstName} ${user.lastName} ${user.email} ${user.contact} ${user.id}");
+          print("access token: $accessToken");
+
           // Save token in state
-          state = state.copyWith(isAuthenticated: true, token: token);
+          state = state.copyWith(isAuthenticated: true, token: accessToken);
 
           // Persist token
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('authToken', token);
+          await prefs.setString('authToken', accessToken);
           await prefs.setString('firstName', user.firstName);
           await prefs.setString('lastName', user.lastName);
           await prefs.setString('email', user.email);
-          await prefs.setString('role', user.role!);
+          await prefs.setString('contact', user.contact);
+          await prefs.setString('role', 'user');
     } catch (e) {
       print(e);
     }
