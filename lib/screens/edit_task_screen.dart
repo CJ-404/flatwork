@@ -143,7 +143,7 @@ class EditTaskScreen extends ConsumerWidget {
                             //   return Center(child: Text('User data not found.'));
                           } else {
                             final userRole = snapshot.data!;
-                            return (userRole == "manager")?
+                            return (userRole == "manager" || userRole == "OWNER")?
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -338,7 +338,7 @@ class EditTaskScreen extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  (userRole == "manager")?
+                  (userRole == "manager" || userRole == "OWNER")?
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
