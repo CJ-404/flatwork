@@ -58,6 +58,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await prefs.remove('firstName');
     await prefs.remove('lastName');
     await prefs.remove('email');
+    await prefs.remove('contact');
     await prefs.remove('role');
   }
 
