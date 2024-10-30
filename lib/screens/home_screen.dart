@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -297,7 +298,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(task.title),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(task.title),
+                                      Text(DateFormat('MMMM d').format(task.endDate!), style: TextStyle(color: Colors.grey, fontSize: 14),),
+                                    ],
+                                  ),
                                   Text(
                                       (task.isCompleted)? "completed" : (task.endDate!.isBefore(DateTime.now()))? "expired" : "onGoing",
                                       style: TextStyle(color: (task.isCompleted)? Colors.green :(task.endDate!.isBefore(DateTime.now()))? Colors.red : Colors.blue,)
