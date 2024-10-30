@@ -67,7 +67,7 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen> {
                             // ),
                             const DisplayWhiteText(
                                 text: 'Project List',
-                                fontSize: 40
+                                fontSize: 30
                             ),
                             // const Gap(50),
                           ],

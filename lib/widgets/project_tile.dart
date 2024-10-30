@@ -30,7 +30,7 @@ class ProjectTile extends StatelessWidget {
             project.title,
             style: context.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              fontSize: 25,
+              fontSize: 22,
               fontFamily: GoogleFonts.akatab().fontFamily,
             ),
           ),

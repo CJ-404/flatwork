@@ -1,4 +1,5 @@
 import 'package:flatwork/config/config.dart';
+import 'package:flatwork/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,8 +9,10 @@ class FlatWorkApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final routerConfig = ref.watch(routesProvider);
+    final themeMode = ref.watch(themeProvider);
 
     return MaterialApp.router(
+      themeMode: themeMode,
       debugShowCheckedModeBanner: false,
       // title: 'Flutter Demo',
       theme: AppTheme.light,

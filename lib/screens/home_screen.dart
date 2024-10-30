@@ -22,6 +22,85 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
 
+  // TODO: fetch tasks from backend
+  List<Task> dummyTasks = [
+    Task(
+      id: '1',
+      title: 'Task 1',
+      description: 'Complete initial design',
+      endDate: DateTime(2024, 4, 2),
+      isCompleted: false,
+      progress: 12.0,
+    ),
+    Task(
+      id: '2',
+      title: 'Task 2',
+      description: 'Submit project proposal',
+      endDate: DateTime(2024, 4, 10),
+      isCompleted: false,
+      progress: 12.0,
+    ),
+    Task(
+      id: '3',
+      title: 'Task 3',
+      description: 'Develop feature X',
+      endDate: DateTime(2024, 11, 5),
+      isCompleted: false,
+      progress: 12.0,
+    ),
+    Task(
+      id: '4',
+      title: 'Task 4',
+      description: 'Review design documents',
+      endDate: DateTime(2024, 5, 15),
+      isCompleted: true,
+      progress: 100.0,
+    ),
+    Task(
+      id: '5',
+      title: 'Task 5',
+      description: 'Team meeting',
+      endDate: DateTime(2024, 11, 25),
+      isCompleted: false,
+      progress: 12.0,
+    ),
+    Task(
+      id: '6',
+      title: 'Task 6',
+      description: 'Finalize budget Finalize budget Finalize budget Finalize budget Finalize budget',
+      endDate: DateTime(2024, 6, 1),
+      isCompleted: false,
+      progress: 12.0,
+    ),
+    Task(
+      id: '6',
+      title: 'Task 7',
+      description: 'Finalize budget Finalize budget Finalize budget Finalize budget Finalize budget',
+      endDate: DateTime(2024, 6, 1),
+      isCompleted: true,
+      progress: 100.0,
+    ),
+  ];
+
+  DateTime selectedDay = DateTime.now();
+  DateTime focusedDay = DateTime.now();
+  Map<DateTime, List<Task>> tasksByDate = {};
+
+  @override
+  void initState() {
+    for (var task in dummyTasks) {
+
+      DateTime dateKey = DateTime(task.endDate!.year, task.endDate!.month, task.endDate!.day);
+
+      if (tasksByDate.containsKey(dateKey)) {
+        tasksByDate[dateKey]!.add(task);
+      } else {
+        tasksByDate[dateKey] = [task];
+      }
+    }
+    super.initState();
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -32,7 +111,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final colors = context.colorScheme;
     final deviceSize = context.deviceSize;
-    final today = DateTime.now();
 
     return MainScaffold(
       child: CustomScrollView(
@@ -137,10 +215,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Divider(thickness: 2),
                       // calender
                       TableCalendar(
-                          focusedDay: today,
+                          focusedDay: focusedDay,
                           firstDay: DateTime.utc(2020, 1, 1),
                           lastDay: DateTime.utc(2030, 12, 31),
+                          selectedDayPredicate: (day) => isSameDay(day, selectedDay),
+                          onDaySelected: (selectedDay, focusedDay) {
+                            setState(() {
+                              this.selectedDay = selectedDay;
+                              this.focusedDay = focusedDay;
+                            });
+                          },
+                          onPageChanged: (newFocusedDay) {
+                            setState(() => focusedDay = newFocusedDay);
+                          },
                           headerStyle: HeaderStyle(formatButtonVisible: false, titleCentered: true),
+                          calendarBuilders: CalendarBuilders(
+                            markerBuilder: (context, day, _) {
+                              final taskCount = tasksByDate[DateTime(day.year, day.month, day.day)]?.length ?? 0;
+                              return taskCount > 0
+                                  ? Align(
+                                alignment: Alignment.center,
+                                child: CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: Colors.blue,
+                                  child: Center(child: Text('${day.day}', style: const TextStyle(fontSize: 16, color: Colors.black))),
+                                ),
+                              )
+                                  : null;
+                            },
+                          ),
                         ),
                     ],
                   ),
@@ -188,11 +291,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       height: 300, // Adjust as needed for demo purposes
                       child: SingleChildScrollView(
                         child: Column(
-                          children: List.generate(
-                              10,
-                                  (index) => ListTile(
-                                title: Text('Event $index'),
-                              )),
+                          children: tasksByDate[DateTime(selectedDay.year, selectedDay.month, selectedDay.day)]?.
+                          map((task) => ListTile(
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(task.title),
+                                  Text(
+                                      (task.isCompleted)? "completed" : (task.endDate!.isBefore(DateTime.now()))? "expired" : "onGoing",
+                                      style: TextStyle(color: (task.isCompleted)? Colors.green :(task.endDate!.isBefore(DateTime.now()))? Colors.red : Colors.blue,)
+                                  ),
+                                ],
+                              ),
+                              onTap: () =>  _showEventDetailsOverlay(context, task),
+                            )
+                          ).toList() ?? [Center(child: Text("No tasks for the selected day."))]
                         ),
                       ),
                     ),
@@ -204,4 +318,69 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       );
   }
+
+  void _showEventDetailsOverlay(BuildContext context, Task task) {
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: const EdgeInsets.all(10),
+          title: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                task.title,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              Divider(),
+            ],
+          ),
+          content: Material(
+            color: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 2, bottom: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(task.description, style: Theme.of(context).textTheme.titleMedium,),
+                  const SizedBox(height: 8),
+                  Text("Due Date: ${task.endDate?.year}-${task.endDate?.month}-${task.endDate?.day}", style: Theme.of(context).textTheme.bodyLarge,),
+                  const SizedBox(height: 8),
+                  Text("Status: ${task.isCompleted ? "Completed" : "Pending"}", style: Theme.of(context).textTheme.bodyLarge,),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: ()
+              {
+                // TODO: set user role according to the project referring to
+                Navigator.pop(context);
+                ref
+                    .read(taskIdProvider.notifier)
+                    .state = "4ff22e99-b7";
+                ref.read(taskProgressProvider.notifier).state = task.progress!;
+                context.pushNamed(
+                  RouteLocation.editTask,
+                  pathParameters: {'taskId': "4ff22e99-b7"},
+                );
+              },
+              child: const Text('Go to'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+
+          ],
+        );
+      },
+    );
+  }
+
 }

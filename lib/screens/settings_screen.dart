@@ -9,6 +9,8 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../providers/theme_provider.dart';
+
 class SettingsScreen extends ConsumerStatefulWidget {
   static SettingsScreen builder(BuildContext context, GoRouterState state)
   => const SettingsScreen();
@@ -28,28 +30,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = ref.watch(themeProvider) == ThemeMode.dark;
     final colors = context.colorScheme;
     final deviceSize = context.deviceSize;
 
     return MainScaffold(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: colors.primary,
+          title: DisplayWhiteText(text: "Settings", fontSize: 20)
+        ),
         body: Column(
           children: [
-            Column(
-              children: [
-                Container(
-                  height: deviceSize.height*0.3,
-                  width: deviceSize.width,
-                  color: colors.primary,
-                  child: Center(
-                    child: const DisplayWhiteText(
-                        text: 'Settings',
-                        fontSize: 40
-                    ),
-                  ),
-                ),
-              ],
-            ),
             SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(20),
@@ -75,7 +67,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             "Profile Settings",
                             style: context.textTheme.headlineSmall?.copyWith(
                               fontWeight: FontWeight.bold,
-                              fontSize: 25,
+                              fontSize: 22,
                             ),
                           ),
                           const Gap(2),
@@ -88,6 +80,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                         ],
                       ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 16,
+                      top: 10,
+                      bottom: 10,
+                      right: 10,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Dark Theme",
+                          style: context.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
+                          ),
+                        ),
+                        Switch(
+                          value: isDarkMode,
+                          onChanged: (value) {
+                            ref.read(themeProvider.notifier).toggleTheme();
+                          },
+                        ),
+                      ],
                     ),
                   ),
                   InkWell(
@@ -110,7 +128,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             "Log Out",
                             style: context.textTheme.headlineSmall?.copyWith(
                               fontWeight: FontWeight.bold,
-                              fontSize: 25,
+                              fontSize: 22,
                             ),
                           ),
                           const Gap(2),

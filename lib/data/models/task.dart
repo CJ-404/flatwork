@@ -10,7 +10,7 @@ class Task extends Equatable {
   final bool isCompleted;
   final double? progress;
   // final String time;
-  // final String date;
+  final DateTime? endDate;
 
   const Task({
     this.id,
@@ -20,6 +20,7 @@ class Task extends Equatable {
     this.assignedUser,
     required this.isCompleted,
     this.progress,
+    this.endDate,
 
     // required this.time,
     // required this.date
@@ -41,6 +42,7 @@ class Task extends Equatable {
       // assignedTeamMembers: const [],//json['teamMembers'],
       isCompleted: false,
       progress: json['progressStatus'],
+      endDate: DateTime(2024, 4, 2),
     );
   }
 
@@ -64,6 +66,7 @@ class Task extends Equatable {
       // assignedTeamMembers,
       isCompleted,
       progress!,
+      endDate!,
       // time,
       // date,
     ];
