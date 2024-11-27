@@ -6,9 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/project/projects_provider.dart';
 
 class ProgressBarWithLabels extends ConsumerWidget {
-  const ProgressBarWithLabels({super.key,required this.taskId});
+  const ProgressBarWithLabels({super.key,required this.taskId, required this.editAccess});
 
   final String taskId;
+  final bool editAccess;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -37,18 +38,23 @@ class ProgressBarWithLabels extends ConsumerWidget {
               divisions: 100, // Allows selection of any percentage
               label: progressValue.round().toString(),
               onChanged: (double value) async {
-                // Update the progress value using state management
-                try{
-                  print("new progress updated: $value");
-                  final result = await ApiServices().updateTaskProgress(taskId, value);
-                  ref.read(taskProgressProvider.notifier).state = value;
-                  ref.invalidate(tasksProvider);
-                  ref.invalidate(projectProvider);
-                  print("updated progress!");
-                }
-                catch (e){
-                  //failed
-                  print("updated progress failed: $e");
+                if(editAccess) {
+                  // Update the progress value using state management
+                  try {
+                    print("new progress updated: $value");
+                    final result = await ApiServices().updateTaskProgress(
+                        taskId, value);
+                    ref
+                        .read(taskProgressProvider.notifier)
+                        .state = value;
+                    ref.invalidate(tasksProvider);
+                    ref.invalidate(projectProvider);
+                    print("updated progress!");
+                  }
+                  catch (e) {
+                    //failed
+                    print("updated progress failed: $e");
+                  }
                 }
               },
             ),

@@ -111,18 +111,12 @@ class ChatScreen extends ConsumerWidget {
                                             RouteLocation.manageMembers,
                                             pathParameters: {'projectId': project.id.toString()},
                                           );
-                                        } else if (value == 'Manage Project Files') {
-                                          // TODO: add manage project files overlay here
                                         }
                                       },
                                       itemBuilder: (context) => [
                                         const PopupMenuItem<String>(
                                           value: 'Manage Project Members',
                                           child: Text('Manage Project Members'),
-                                        ),
-                                        const PopupMenuItem<String>(
-                                          value: 'Manage Project Files',
-                                          child: Text('Manage Project Files'),
                                         ),
                                       ],
                                     )

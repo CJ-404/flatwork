@@ -117,10 +117,7 @@ class ManageProjectUsers extends ConsumerWidget {
                                         size: 28,
                                       ),
                                       onSelected: (value) {
-                                        if (value == 'Manage Project Files') {
-                                          // TODO: open manage files overlay
-                                          // showOverlayDialog(context, ref, []);
-                                        } else if (value == 'Chat with Project Members') {
+                                        if (value == 'Chat with Project Members') {
                                           context.pushNamed(
                                             RouteLocation.chat,
                                             pathParameters: {'projectId': project.id.toString()},
@@ -128,10 +125,6 @@ class ManageProjectUsers extends ConsumerWidget {
                                         }
                                       },
                                       itemBuilder: (context) => [
-                                        const PopupMenuItem<String>(
-                                          value: 'Manage Project Files',
-                                          child: Text('Manage Project Files'),
-                                        ),
                                         const PopupMenuItem<String>(
                                           value: 'Chat with Project Members',
                                           child: Text('Chat with Project Members'),

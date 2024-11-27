@@ -31,190 +31,223 @@ class EditTaskScreen extends ConsumerWidget {
     final colors = context.colorScheme;
     final int maxTitleLength = 25;
 
-    return fetchedTask.when(
-      data: (fetchedTask){
-        Task task = fetchedTask;
-        return Scaffold(
+    final loading = ref.watch(loadingProvider);
+    final userDataState = ref.watch(userDataProvider);
+
+    return userDataState.when(
+        loading: () => CircularProgressIndicator(),
+        error: (err, stack) => Text("Error: $err"),
+        data: (userData) {
+          return fetchedTask.when(
+          data: (fetchedTask){
+          Task task = fetchedTask;
+          final editAccess = (task.assignedUser?.id == userData["userId"] || userData["role"] == "MANAGER" || userData["role"] == "OWNER");
+
+          return Scaffold(
           key: scaffoldKey,
           appBar: AppBar(
-            backgroundColor: Colors.cyan,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                DisplayWhiteText(
-                  text: task.title.length <= maxTitleLength?
-                  task.title
-                      :
-                  '${task.title.substring(0, maxTitleLength)}...',
-                  fontSize: 20,),
-                IconButton(
-                  icon: Icon(Icons.edit_document, color: colors.onPrimary,size: 30,),
-                  onPressed: () {
-                    showOverlayDialog(context, ref);
-                  },
-                ),
-              ],
-            ),
+          backgroundColor: Colors.cyan,
+          title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+          DisplayWhiteText(
+          text: task.title.length <= maxTitleLength?
+          task.title
+              :
+          '${task.title.substring(0, maxTitleLength)}...',
+          fontSize: 20,),
+          IconButton(
+          icon: Icon(Icons.edit_document, color: colors.onPrimary,size: 30,),
+          onPressed: () {
+          showOverlayDialog(context, ref, editAccess);
+          },
+          ),
+          ],
+          ),
           ),
           body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                top: 10,
-                bottom: 10,
-                right: 10,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Task description",
-                        style: context.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
-                        ),
-                      ),
-                      const Divider(
-                        thickness: 1,
-                        color: Colors.black,
-                      ),
-                      Text(
-                        task.description,
-                        style: context.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      Text(
-                        "Progress",
-                        style: context.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
-                        ),
-                      ),
-                      const Divider(
-                        thickness: 1,
-                        color: Colors.black,
-                      ),
-                      Text(
-                        "Make sure to update your task progress so that project managers can view task status",
-                        style: context.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Center(
-                        child: Text(
-                          "$progressValue%",
-                          style: context.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                      ProgressBarWithLabels(taskId:taskId),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FutureBuilder<String>(
-                        future: AuthServices().getSavedUserRole(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(child: Text('Error: ${snapshot.error}'));
-                            // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
-                            //   return Center(child: Text('User data not found.'));
-                          } else {
-                            final userRole = snapshot.data!;
-                            return (userRole == "manager" || userRole == "OWNER")?
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "Assigned User",
-                                  style: context.textTheme.headlineSmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25,
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: () async {
-                                    ref.read(userFilterProvider.notifier).state = "";
-                                    await showModalBottomSheet(
-                                      // showDragHandle: true,
-                                      context: context,
-                                      builder: (ctx) {
-                                        return SelectTeamMember(assignedMembers: task.assignedUser==null? []:[task.assignedUser!],scaffoldKey: scaffoldKey,);
-                                      },
-                                    );
-                                  },
-                                  icon: Icon(
-                                    Icons.add,
-                                    size: 30,
-                                  ),
-                                )
-                              ],
-                            )
-                                :
-                            Text(
-                              "Assigned User",
-                              style: context.textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25,
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                      const Divider(
-                        thickness: 1,
-                        color: Colors.black,
-                      ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: 100,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            DisplayListOfUsers(
-                              assignedUsers: task.assignedUser == null? [] : [task.assignedUser!],
-                              scaffoldKey: scaffoldKey,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+          child: Padding(
+          padding: const EdgeInsets.only(
+          left: 16,
+          top: 10,
+          bottom: 10,
+          right: 10,
           ),
-        );
-      },
-      error: (error,s) => Text(error.toString()),
-      loading: () =>  const Center(
-        child: CircularProgressIndicator(),
-      ),
+          child: Column(
+          mainAxisAlignment: loading? MainAxisAlignment.center :MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children:
+          loading?
+          [
+          Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: const Text("uploading.. please wait!"),
+          ),
+          const Center(
+          child: CircularProgressIndicator(),
+          ),
+          ]
+              :
+          [
+          Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          Text(
+          "Task description",
+          style: context.textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.bold,
+          fontSize: 25,
+          ),
+          ),
+          const Divider(
+          thickness: 1,
+          color: Colors.black,
+          ),
+          Text(
+          task.description,
+          style: context.textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.w500,
+          fontSize: 18,
+          ),
+          ),
+          ],
+          ),
+          Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+          Text(
+          "Progress",
+          style: context.textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.bold,
+          fontSize: 25,
+          ),
+          ),
+          const Divider(
+          thickness: 1,
+          color: Colors.black,
+          ),
+          editAccess?
+          Text(
+          "Make sure to update your task progress so that project managers can view task status",
+          style: context.textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.w500,
+          fontSize: 18,
+          ),
+          )
+            :
+          Text(
+            "Note: Since you haven't assigned to this task, you only have read access",
+            style: context.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w500,
+              fontSize: 18,
+            ),
+          )
+            ,
+          ],
+          ),
+          Column(
+          children: [
+          Center(
+          child: Text(
+          "$progressValue%",
+          style: context.textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.w500,
+          fontSize: 18,
+          ),
+          ),
+          ),
+          ProgressBarWithLabels(taskId:taskId, editAccess: editAccess,),
+          ],
+          ),
+          Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          FutureBuilder<String>(
+          future: AuthServices().getSavedUserRole(),
+          builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+          // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
+          //   return Center(child: Text('User data not found.'));
+          } else {
+          final userRole = snapshot.data!;
+          return (editAccess)?
+          Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+          Text(
+          "Assigned User",
+          style: context.textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.bold,
+          fontSize: 25,
+          ),
+          ),
+          IconButton(
+          onPressed: () async {
+          ref.read(userFilterProvider.notifier).state = "";
+          await showModalBottomSheet(
+          // showDragHandle: true,
+          context: context,
+          builder: (ctx) {
+          return SelectTeamMember(assignedMembers: task.assignedUser==null? []:[task.assignedUser!],scaffoldKey: scaffoldKey,);
+          },
+          );
+          },
+          icon: Icon(
+          Icons.add,
+          size: 30,
+          ),
+          )
+          ],
+          )
+              :
+          Text(
+          "Assigned User",
+          style: context.textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.bold,
+          fontSize: 25,
+          ),
+          );
+          }
+          },
+          ),
+          const Divider(
+          thickness: 1,
+          color: Colors.black,
+          ),
+          ConstrainedBox(
+          constraints: BoxConstraints(
+          minHeight: 100,
+          ),
+          child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+          DisplayListOfUsers(
+          assignedUsers: task.assignedUser == null? [] : [task.assignedUser!],
+          scaffoldKey: scaffoldKey,
+          ),
+          ],
+          ),
+          ),
+          ],
+          ),
+          ],
+          ),
+          ),
+          ),
+          );
+          },
+          error: (error,s) => Text(error.toString()),
+          loading: () =>  const Center(
+          child: CircularProgressIndicator(),
+          ),
+          );
+        },
     );
   }
 
@@ -252,7 +285,9 @@ class EditTaskScreen extends ConsumerWidget {
                   children: [
                     ElevatedButton(
                       onPressed: () async {
+                        Navigator.of(context).pop(); // Close the dialog
                         try{
+                          ref.read(loadingProvider.notifier).state = true;
                           // upload file to the firebase
                           final uploadedUrl = await FileManager().uploadFile(pickedFile, 'shared_files/task/');
                           print('upload Url : $uploadedUrl');
@@ -262,6 +297,7 @@ class EditTaskScreen extends ConsumerWidget {
                           final created = await ApiServices().createTaskFile(taskId, pickedFile.files.first.name, uploadedUrl);
                           // TODO: refresh getting shared files ref
                           // for now just pop from context to load again by taping
+                          ref.read(loadingProvider.notifier).state = false;
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Row(
@@ -279,6 +315,7 @@ class EditTaskScreen extends ConsumerWidget {
                         }
                         catch (e){
                           print('error: $e');
+                          ref.read(loadingProvider.notifier).state = false;
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Row(
@@ -294,7 +331,6 @@ class EditTaskScreen extends ConsumerWidget {
                             ),
                           );
                         }
-                        Navigator.of(context).pop(); // Close the dialog
                       },
                       child: const Text('Upload'),
                     ),
@@ -315,7 +351,7 @@ class EditTaskScreen extends ConsumerWidget {
     );
   }
 
-  void showOverlayDialog(BuildContext context, WidgetRef ref) async {
+  void showOverlayDialog(BuildContext context, WidgetRef ref, bool editAccess) async {
     final userRole = await AuthServices().getSavedUserRole();
     try{
       final files = await ApiServices().getTaskFiles(taskId);
@@ -338,7 +374,7 @@ class EditTaskScreen extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  (userRole == "manager" || userRole == "OWNER")?
+                  (editAccess)?
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
