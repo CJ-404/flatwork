@@ -163,10 +163,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  NotificationTile(message: "You have a task due on nov 2",),
-                                  NotificationTile(message: "You have a task due on nov 4",),
                                   NotificationTile(message: "New project invitation!",),
-                                  // NotificationTile(message: "New messages - project flatpack ",),
+                                  NotificationTile(message: "New project invitation!",),
+                                  NotificationTile(message: "New project invitation!",),
                                 ]
 
                             ),
@@ -288,6 +287,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     const Divider(),
                     // Calendar Events Content
+                    // TODO: LOADING
                     Container(
                       height: 300, // Adjust as needed for demo purposes
                       child: SingleChildScrollView(
