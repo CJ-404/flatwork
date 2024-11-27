@@ -27,6 +27,8 @@ class LoginScreen extends ConsumerWidget {
     final deviceSize = context.deviceSize;
     final authState = ref.watch(authProvider);
 
+    final loading = ref.watch(loadingProvider);
+
     return Scaffold(
       key: _scaffoldKey,
       body: SingleChildScrollView(
@@ -72,7 +74,15 @@ class LoginScreen extends ConsumerWidget {
                         backgroundColor: colors.onPrimary,
                         minimumSize: Size(deviceSize.width, 40), // Set the minimum width and height
                       ),
-                      child: const Text(
+                      child:
+                      loading?
+                      SizedBox(
+                        height: 25.0,
+                        width: 25.0,
+                        child: CircularProgressIndicator(),
+                      )
+                      :
+                      const Text(
                           "login",
                           style: TextStyle(
                           fontSize: 16, // Font size

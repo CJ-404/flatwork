@@ -65,6 +65,8 @@ class SignupScreen extends ConsumerStatefulWidget {
     final deviceSize = context.deviceSize;
     final authState = ref.watch(authProvider);
 
+    final loading = ref.watch(loadingProvider);
+
     return Scaffold(
       key: _scaffoldKey,
       body: SafeArea(
@@ -173,7 +175,11 @@ class SignupScreen extends ConsumerStatefulWidget {
                             backgroundColor: colors.onPrimary,
                             minimumSize: Size(deviceSize.width, 40), // Set the minimum width and height
                           ),
-                          child: const Text(
+                          child:
+                          loading?
+                          CircularProgressIndicator()
+                          :
+                          const Text(
                             "Register",
                             style: TextStyle(
                               fontSize: 16, // Font size
