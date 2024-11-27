@@ -14,7 +14,7 @@ class RouteLocation{
   static String get viewProject => '/viewProject/:projectId';
   static String get manageMembers => '/manageMembers/:projectId';
   static String get chat => '/chat/:projectId';
-  static String get inbox => '/inbox/:projectId/:userName/:userId';
+  static String get inbox => '/inbox/:projectId/:receiverName/:receiverId/:userId';
   static String get editTask => '/editTask/:taskId';
   static String get addTask => '/addTask/:projectId';
 }

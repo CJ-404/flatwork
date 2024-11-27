@@ -83,13 +83,15 @@ class DisplayListOfChats extends StatelessWidget {
                           ),
                         )
                             : null, // Show a badge if there are new messages
-                        onTap: () {
+                        onTap: () async {
+                          final userId = await AuthServices().getSavedUserId();
                           context.pushNamed(
                             RouteLocation.inbox,
                             pathParameters: {
                               'projectId': projectId.toString(),
-                              'userName' : userName.toString(),
-                              'userId' : userName+"123".toString(),
+                              'receiverName' : userName.toString(),
+                              'receiverId' : (userName == "Announcements")? "ffffff" : userName+"123".toString(),
+                              'userId' : userId.toString(),
                             },
                           );
                         },
