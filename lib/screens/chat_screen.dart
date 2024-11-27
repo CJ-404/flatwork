@@ -49,19 +49,19 @@ class ChatScreen extends ConsumerWidget {
 
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Implement your function to write a message to a new user
-          // TODO: dialog to select a new user to chat with
-          showOverlayDialog(context,ref,activeChats);
-        },
-        backgroundColor: colors.secondary, // Set the background color of the button
-        child: const Icon(
-          Icons.message, // Set the icon for the FAB
-          color: Colors.white, // Set the color of the icon
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     // Implement your function to write a message to a new user
+      //     // TODO: dialog to select a new user to chat with
+      //     showOverlayDialog(context,ref,activeChats);
+      //   },
+      //   backgroundColor: colors.secondary, // Set the background color of the button
+      //   child: const Icon(
+      //     Icons.message, // Set the icon for the FAB
+      //     color: Colors.white, // Set the color of the icon
+      //   ),
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: Stack(
         children: [
           projectState.when(
