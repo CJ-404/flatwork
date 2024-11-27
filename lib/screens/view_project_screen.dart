@@ -41,170 +41,231 @@ class ViewProjectScreen extends ConsumerWidget {
     return projectState.when(
         data: (projectState) {
           Project project = projectState;
-          print(project);
 
           return tasksState.when(
               data: (tasksState) {
                 List<Task> tasksList = tasksState.map((e) => e).toList();
-
                 return
-                  Scaffold(
-                  body: Stack(
-                    children: [
-                      Column(
+                  FutureBuilder<String>(
+                      future: AuthServices().getSavedUserRole(),
+                    builder: (context, snapshot) {
+                      final userRole = snapshot.data!;
+                      final bool adminAccess = (userRole == "OWNER" || userRole == "MANAGER");
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                        // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
+                        //   return Center(child: Text('User data not found.'));
+                      } else {
+                        return Scaffold(
+                          body: Stack(
                             children: [
-                              Container(
-                                height: deviceSize.height*0.35,
-                                width: deviceSize.width,
-                                color: colors.secondary,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        IconButton(
-                                          icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
-                                          onPressed: () {
-                                            ref.read(authProvider.notifier).logout();
-                                            context.pushNamed(RouteLocation.login);
-                                          },
-                                        ),
-                                        PopupMenuButton<String>(
-                                          icon: const Icon(
-                                            Icons.more_vert,
-                                            color: Colors.white,
-                                            size: 28,
-                                          ),
-                                          onSelected: (value) {
-                                            if (value == 'Manage Project Members') {
-                                              context.pushNamed(
-                                                RouteLocation.manageMembers,
-                                                pathParameters: {'projectId': project.id.toString()},
-                                              );
-                                            } else if (value == 'Manage Project Files') {
-                                              showOverlayDialog(context, ref);
-                                            } else if (value == 'Chat with Project Members') {
-                                              context.pushNamed(
-                                                RouteLocation.chat,
-                                                pathParameters: {'projectId': project.id.toString()},
-                                              );
-                                            }
-                                          },
-                                          itemBuilder: (context) => [
-                                            const PopupMenuItem<String>(
-                                              value: 'Manage Project Members',
-                                              child: Text('Manage Project Members'),
-                                            ),
-                                            const PopupMenuItem<String>(
-                                              value: 'Manage Project Files',
-                                              child: Text('Manage Project Files'),
-                                            ),
-                                            const PopupMenuItem<String>(
-                                              value: 'Chat with Project Members',
-                                              child: Text('Chat with Project Members'),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    DisplayWhiteText(
-                                        text: project.title,
-                                        fontSize: 32
-                                    ),
-                                    const DisplayWhiteText(
-                                        text: 'Task List',
-                                        fontSize: 25
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 30.0, top: 0.0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          CircularPercentageIndicator(percentage: project.progress),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                      Positioned(
-                          top: loading? 350: 200,
-                          left: 0,
-                          right: 0,
-                          child: SafeArea(
-                              child: SingleChildScrollView(
-                                    physics: const AlwaysScrollableScrollPhysics(),
-                                    padding: const EdgeInsets.all(20),
+                              Column(
+                                children: [
+                                  Container(
+                                    height: deviceSize.height * 0.35,
+                                    width: deviceSize.width,
+                                    color: colors.secondary,
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .center,
                                       children: [
-                                        loading?
-                                        Column(
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment
+                                              .spaceBetween,
                                           children: [
-                                            Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: const Text("uploading.. please wait!"),
+                                            IconButton(
+                                              icon: Icon(Icons.logout,
+                                                color: colors.onPrimary,
+                                                size: 30,),
+                                              onPressed: () {
+                                                ref.read(authProvider.notifier)
+                                                    .logout();
+                                                context.pushNamed(
+                                                    RouteLocation.login);
+                                              },
                                             ),
-                                            const Center(
-                                              child: CircularProgressIndicator(),
+                                            PopupMenuButton<String>(
+                                              icon: const Icon(
+                                                Icons.more_vert,
+                                                color: Colors.white,
+                                                size: 28,
+                                              ),
+                                              onSelected: (value) {
+                                                if (value ==
+                                                    'Manage Project Members') {
+                                                  context.pushNamed(
+                                                    RouteLocation.manageMembers,
+                                                    pathParameters: {
+                                                      'projectId': project.id
+                                                          .toString()
+                                                    },
+                                                  );
+                                                } else if (value ==
+                                                    'Manage Project Files') {
+                                                  showOverlayDialog(
+                                                      context, ref, adminAccess);
+                                                } else if (value ==
+                                                    'Chat with Project Members') {
+                                                  context.pushNamed(
+                                                    RouteLocation.chat,
+                                                    pathParameters: {
+                                                      'projectId': project.id
+                                                          .toString()
+                                                    },
+                                                  );
+                                                }
+                                              },
+                                              itemBuilder: (context) =>
+                                              adminAccess?
+                                              [
+                                                const PopupMenuItem<String>(
+                                                  value: 'Manage Project Members',
+                                                  child: Text(
+                                                      'Manage Project Members'),
+                                                ),
+                                                const PopupMenuItem<String>(
+                                                  value: 'Manage Project Files',
+                                                  child: Text(
+                                                      'Manage Project Files'),
+                                                ),
+                                                const PopupMenuItem<String>(
+                                                  value: 'Chat with Project Members',
+                                                  child: Text(
+                                                      'Chat with Project Members'),
+                                                ),
+                                              ]
+                                              :
+                                              [
+                                                const PopupMenuItem<String>(
+                                                  value: 'Manage Project Files',
+                                                  child: Text(
+                                                      'Manage Project Files'),
+                                                ),
+                                                const PopupMenuItem<String>(
+                                                  value: 'Chat with Project Members',
+                                                  child: Text(
+                                                      'Chat with Project Members'),
+                                                ),
+                                              ]
+                                              ,
                                             ),
                                           ],
-                                        )
-                                        :
-                                        DisplayListOfTasks(
-                                          tasks: tasksList,
-                                          ref: ref,
+                                        ),
+                                        DisplayWhiteText(
+                                            text: project.title,
+                                            fontSize: 32
+                                        ),
+                                        const DisplayWhiteText(
+                                            text: 'Task List',
+                                            fontSize: 25
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              right: 30.0, top: 0.0),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment
+                                                .end,
+                                            children: [
+                                              CircularPercentageIndicator(
+                                                  percentage: project.progress),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
                                   ),
-                          )
-                      ),
-                    ],
-                  ),
-                  floatingActionButton: SizedBox(
-                    width: deviceSize.width * 0.9,
-                    child: FutureBuilder<String>(
-                      future: AuthServices().getSavedUserRole(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
-                          // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
-                          //   return Center(child: Text('User data not found.'));
-                        } else {
-                          final userRole = snapshot.data!;
-                          return (userRole == "Manager" || userRole == "OWNER")?
-                          ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: colors.secondary,
+                                ],
                               ),
-                              onPressed: ()
-                              {
-                                context.pushNamed(
-                                  RouteLocation.addTask,
-                                  pathParameters: {'projectId':projectId},
-                                );
+                              Positioned(
+                                  top: loading ? 350 : 200,
+                                  left: 0,
+                                  right: 0,
+                                  child: SafeArea(
+                                    child: SingleChildScrollView(
+                                      physics: const AlwaysScrollableScrollPhysics(),
+                                      padding: const EdgeInsets.all(20),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment
+                                            .stretch,
+                                        children: [
+                                          loading ?
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.all(
+                                                    8.0),
+                                                child: const Text(
+                                                    "uploading.. please wait!"),
+                                              ),
+                                              const Center(
+                                                child: CircularProgressIndicator(),
+                                              ),
+                                            ],
+                                          )
+                                              :
+                                          DisplayListOfTasks(
+                                            tasks: tasksList,
+                                            ref: ref,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                              ),
+                            ],
+                          ),
+                          floatingActionButton: SizedBox(
+                            width: deviceSize.width * 0.9,
+                            child: FutureBuilder<String>(
+                              future: AuthServices().getSavedUserRole(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Center(
+                                      child: Text('Error: ${snapshot.error}'));
+                                  // } else if (!snapshot.hasData || snapshot.data!['token'] == null) {
+                                  //   return Center(child: Text('User data not found.'));
+                                } else {
+                                  final userRole = snapshot.data!;
+                                  return (userRole == "Manager" ||
+                                      userRole == "OWNER") ?
+                                  ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: colors.secondary,
+                                      ),
+                                      onPressed: () {
+                                        context.pushNamed(
+                                          RouteLocation.addTask,
+                                          pathParameters: {
+                                            'projectId': projectId
+                                          },
+                                        );
+                                      },
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: DisplayWhiteText(
+                                          text: 'Add new Task',
+                                          fontSize: 20,
+                                        ),
+                                      )
+                                  )
+                                      : Container();
+                                }
                               },
-                              child: const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: DisplayWhiteText(
-                                  text:'Add new Task',
-                                  fontSize: 20,
-                                ),
-                              )
-                          )
-                              : Container();
-                        }
-                      },
-                    ),
-                  ),
-                  floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-                );
+                            ),
+                          ),
+                          floatingActionButtonLocation: FloatingActionButtonLocation
+                              .centerFloat,
+                        );
+                      }
+                    }
+                  );
               },
               // TODO: snakBar here
               error: (error,s) => Text(error.toString()),
@@ -320,7 +381,7 @@ class ViewProjectScreen extends ConsumerWidget {
     );
   }
 
-  void showOverlayDialog(BuildContext context, WidgetRef ref) async {
+  void showOverlayDialog(BuildContext context, WidgetRef ref, bool adminAccess) async {
     final userRole = await AuthServices().getSavedUserRole();
     try{
       final files = await ApiServices().getProjectFiles(projectId);
@@ -343,7 +404,7 @@ class ViewProjectScreen extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  (userRole == "manager" || userRole == "OWNER")?
+                  (adminAccess)?
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
