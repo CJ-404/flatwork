@@ -36,6 +36,9 @@ class InboxScreen extends ConsumerWidget {
     // not empty
     if (_messageController.text.isNotEmpty) {
       //send
+      receiverName == "Announcements"?
+      await _chatServices.sendAnnouncementMessage(projectId, _messageController.text)
+        :
       await _chatServices.sendMessage(projectId, receiverId, _messageController.text);
       _messageController.text = "";
     }
@@ -109,7 +112,7 @@ class InboxScreen extends ConsumerWidget {
 
   Widget _buildMessageList(BuildContext context) {
     return StreamBuilder(
-        stream: _chatServices.getMessages(projectId, userId, receiverId),
+        stream: receiverName == "Announcements"? _chatServices.getAnnouncementMessages(projectId, userId) : _chatServices.getMessages(projectId, userId, receiverId),
         builder: (context, snapshot) {
           //errors
           if (snapshot.hasError) {
