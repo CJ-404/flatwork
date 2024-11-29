@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flatwork/data/models/calendarTask.dart';
+import 'package:flatwork/data/models/invitation.dart';
 import 'package:flatwork/services/auth_services.dart';
 import 'package:http/http.dart';
 import 'package:flatwork/data/data.dart';
@@ -95,6 +97,25 @@ class ApiServices{
     }
   }
 
+  Future<List<CalendarTask>> getAllTasksByUserId(String userId) async {
+    final url = Uri.parse("$endpoint/task/get_all_tasks_by_user_id?userID=$userId");
+    Response response = await get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+    );
+    if (response.statusCode == 200){
+      final List result = jsonDecode(response.body)['data'];
+      return result.map(((e) => CalendarTask.fromJson(e))).toList();
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
   Future<List<File>> getTaskFiles(String taskId) async {
     final url = Uri.parse("$endpoint/file/getTaskFile?taskId=$taskId");
     Response response = await get(
@@ -133,8 +154,8 @@ class ApiServices{
     }
   }
 
-  Future<List<User>> getUsers() async {
-    final url = Uri.parse("$endpoint/user/get_all_team_members");
+  Future<List<User>> getProjectUsers(String projectId) async {
+    final url = Uri.parse("$endpoint/user/get_all_project_user?projectID=$projectId");
     Response response = await get(
         url,
       headers: {
@@ -152,9 +173,47 @@ class ApiServices{
     }
   }
 
+  Future<List<User>> getAllUsers(String projectId) async {
+    final url = Uri.parse("$endpoint/user/get_all_users");
+    Response response = await get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+    );
+    if (response.statusCode == 200){
+      final List result = jsonDecode(response.body)['data'];
+      return result.map(((e) => User.fromJson(e))).toList();
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
+  Future<List<Invitation>> getInvitations(String userId) async {
+    final url = Uri.parse("$endpoint/user/get_invitations?userID=$userId");
+    Response response = await get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+    );
+    if (response.statusCode == 200){
+      final List result = jsonDecode(response.body)['data'];
+      return result.map(((e) => Invitation.fromJson(e))).toList();
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
   // Ignore for now
   Future<User> getUser(String userId) async {
-    final url = Uri.parse("user/$endpoint?userID=$userId");
+    final url = Uri.parse("user/get_user_by_userID?userID=$userId");
     Response response = await get(
         url,
       headers: {
@@ -289,6 +348,174 @@ class ApiServices{
         body: body
     );
     if (response.statusCode == 201){
+      // final List result = jsonDecode(response.body)['data'];
+      return true;
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
+  Future<bool> sendInvitation(String userId, String projectId, String invitedUserId, int role) async {
+    final url = Uri.parse("$endpoint/user/invite_to_member");
+    final body =  jsonEncode({
+      "userID": userId,
+      "projectID": projectId,
+      "invitedUserID": invitedUserId,
+      "role": role, // 1 , 2
+    });
+    Response response = await post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+      body: body,
+    );
+    if (response.statusCode == 200 || response.statusCode == 201){
+      // final List result = jsonDecode(response.body)['data'];
+      return true;
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
+  Future<bool> removeUserFromProject(String projectId, String managerId, String userId) async {
+    final url = Uri.parse("$endpoint/user/invite_to_member");
+    final body =  jsonEncode({
+      "projectID": projectId,
+      "managerID": managerId,
+      "userID": userId,
+    });
+    Response response = await post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+      body: body,
+    );
+    if (response.statusCode == 200 || response.statusCode == 201){
+      // final List result = jsonDecode(response.body)['data'];
+      return true;
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
+  Future<bool> acceptInvitation(String invitationId) async {
+    final url = Uri.parse("$endpoint/user/accept_invitation?invitationID=$invitationId");
+    // final body =  jsonEncode({});
+    Response response = await post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+          "Authorization": "Bearer $accessToken",
+        },
+    );
+    if (response.statusCode == 200 || response.statusCode == 201){
+      // final List result = jsonDecode(response.body)['data'];
+      return true;
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
+  Future<bool> rejectInvitation(String invitationId) async {
+    final url = Uri.parse("$endpoint/user/decline_invitation?invitationID=$invitationId");
+    // final body =  jsonEncode({});
+    Response response = await post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+    );
+    if (response.statusCode == 200 || response.statusCode == 201){
+      // final List result = jsonDecode(response.body)['data'];
+      return true;
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
+  Future<bool> updatePassword(String userId, String oldPassword, String newPassword) async {
+    final url = Uri.parse("$endpoint/user/password_change");
+    final body =  jsonEncode({
+      "userID": userId,
+      "oldPassword": oldPassword,
+      "newPassword": newPassword,
+    });
+    Response response = await put(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+      body: body,
+    );
+    if (response.statusCode == 200 || response.statusCode == 201){
+      // final List result = jsonDecode(response.body)['data'];
+      return true;
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
+  Future<bool> updateUser(String userId, String firstName, String lastName, String contact ) async {
+    final url = Uri.parse("$endpoint/user/update_user");
+    final body =  jsonEncode({
+      "user_id": userId,
+      "first_name": firstName,
+      "last_name": lastName,
+      "contact": contact,
+    });
+    Response response = await put(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+      body: body,
+    );
+    if (response.statusCode == 200 || response.statusCode == 201){
+      // final List result = jsonDecode(response.body)['data'];
+      return true;
+    }
+    else {
+      throw Exception(response.reasonPhrase);
+    }
+  }
+
+  Future<bool> updateUserRole(String ownerUserId, String userId, String projectId, int role ) async {
+    final url = Uri.parse("$endpoint/user/update_user");
+    final body =  jsonEncode({
+      "projectOwnerID": ownerUserId,
+      "userID": userId,
+      "projectID": projectId,
+      "role": role //1:Manager,2:Team Member
+    });
+    Response response = await put(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Authorization": "Bearer $accessToken",
+      },
+      body: body,
+    );
+    if (response.statusCode == 200 || response.statusCode == 201){
       // final List result = jsonDecode(response.body)['data'];
       return true;
     }

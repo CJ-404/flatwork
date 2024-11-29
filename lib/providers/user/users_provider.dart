@@ -1,7 +1,10 @@
 import 'package:flatwork/data/data.dart';
+import 'package:flatwork/data/models/invitation.dart';
 import 'package:flatwork/providers/api_service_provider.dart';
 import 'package:flatwork/services/auth_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../project/projects_provider.dart';
 
 final AllUserListProvider = StateNotifierProvider.autoDispose<AllUserListNotifier, List<Map<String, String>>>(
       (ref) => AllUserListNotifier(),
@@ -73,13 +76,19 @@ final userFilterProvider = StateProvider<String>((ref) {
 });
 
 final usersProvider = FutureProvider.autoDispose<List<User>>((ref) async {
-  return ref.watch(apiServiceProvider).getUsers();
+  final String projectId = ref.watch(projectIdProvider);
+  return ref.watch(apiServiceProvider).getProjectUsers(projectId);
 });
 
 // final assignedUsersProvider = FutureProvider<List<User>>((ref) async {
 //   final String taskId = ref.watch(taskIdProvider);
 //   return ref.watch(apiServiceProvider).getAssignedUsers(taskId);
 // });
+
+final invitationProvider = FutureProvider.autoDispose<List<Invitation>>((ref) async {
+  final String userId = await  AuthServices().getSavedUserId();
+  return ref.watch(apiServiceProvider).getInvitations(userId);
+});
 
 final authServicesProvider = Provider<AuthServices>((ref) {
   return AuthServices(); // Your existing AuthService class

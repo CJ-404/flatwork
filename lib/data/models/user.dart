@@ -24,6 +24,7 @@ class User extends Equatable {
       lastName: json['last_name'],
       email: json['email'],
       contact: json['contact'],
+      role: json['role']?? "",
     );
   }
 
