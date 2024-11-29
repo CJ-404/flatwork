@@ -25,6 +25,7 @@ class AuthServices{
     try {
 
       // Persist token
+      print("set new role=$newRole");
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('role', newRole);
     } catch (e) {
@@ -43,7 +44,6 @@ class AuthServices{
   Future<String> getSavedUserId() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
-
     return userId!;
   }
 

@@ -37,9 +37,10 @@ class InboxScreen extends ConsumerWidget {
     if (_messageController.text.isNotEmpty) {
       //send
       receiverName == "Announcements "?
-      await _chatServices.sendAnnouncementMessage(projectId, _messageController.text)
+      _chatServices.sendAnnouncementMessage(projectId, _messageController.text)
         :
-      await _chatServices.sendMessage(projectId, receiverId, _messageController.text);
+      _chatServices.sendMessage(projectId, receiverId, _messageController.text);
+
       _messageController.text = "";
     }
   }
@@ -64,7 +65,7 @@ class InboxScreen extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
-                  children: (receiverName == "Announcements ") && (userData['role'] == "MEMBER")?
+                  children: (receiverName == "Announcements ") && (userData['role'] == "Team Member")?
                   [
                     Expanded(
                         child: Padding(

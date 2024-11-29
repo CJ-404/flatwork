@@ -49,13 +49,14 @@ class NotificationTile extends ConsumerWidget {
                       _showNotificationDetailsOverlay(context, ref);
                     },
                     child: Text(
-                      message,
+                      message.length< 30? message : "${message.substring(0,30)}...",
+                      // "${message.split(' ')[0]} has invited you!",
                       style: style.titleMedium?.copyWith(
                         fontSize: 17,
                       ),
                     ),
                   ),
-                  Text("12.34", style: Theme.of(context).textTheme.bodyLarge,),
+                  // Text("12.34", style: Theme.of(context).textTheme.bodyLarge,),
                   // IconButton(onPressed: (){
                   //       // onClose!(true);
                   //       // TODO: delete notification
@@ -112,24 +113,43 @@ class NotificationTile extends ConsumerWidget {
             TextButton(
               onPressed: () async
               {
-                // TODO: set user role according to the project referring to
-                Navigator.pop(context);
-                ref.read(projectIdProvider.notifier).state = projectId;
-                await AuthServices().setProjectRole(role);
-                ref.invalidate(invitationProvider);
-                context.pushNamed(
-                  RouteLocation.viewProject,
-                  pathParameters: {'projectId': projectId},
-                );
+                // TODO: Loading
+                try{
+                  final result = await ApiServices().acceptInvitation(id);
+                  if(result)
+                    {
+                      Navigator.pop(context);
+                      ref.read(projectIdProvider.notifier).state = projectId;
+                      await AuthServices().setProjectRole(role);
+                      ref.invalidate(invitationProvider);
+                      context.pushNamed(
+                        RouteLocation.viewProject,
+                        pathParameters: {'projectId': projectId},
+                      );
+                    }
+                  else{
+                    print("backend crashed : 405");
+                  }
+                } catch (e)
+                {
+                  print(e.toString());
+                }
               },
               child: const Text('Accept'),
             ),
             TextButton(
-              // TODO: REJECT the invitation
+              // TODO: Loading
               onPressed: () async {
-                await ApiServices().rejectInvitation(id);
-                ref.invalidate(invitationProvider);
-                Navigator.pop(context);
+                try{
+                  await ApiServices().rejectInvitation(id);
+                  ref.invalidate(invitationProvider);
+                  Navigator.pop(context);
+                }
+                catch(e)
+                {
+                  print(e.toString());
+                  Navigator.pop(context);
+                }
               },
         child: const Text('Reject'),
             ),

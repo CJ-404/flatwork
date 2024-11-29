@@ -50,7 +50,8 @@ class ViewProjectScreen extends ConsumerWidget {
                       future: AuthServices().getSavedUserRole(),
                     builder: (context, snapshot) {
                       final userRole = snapshot.data;
-                      final bool adminAccess = (userRole == "OWNER" || userRole == "MANAGER");
+                      // print(userRole);
+                      final bool adminAccess = (userRole == "OWNER" || userRole == "Manager");
 
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flatwork/data/data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,25 +29,27 @@ class AuthNotifier extends StateNotifier<AuthState> {
     _loadAuthToken();
   }
 
-  Future<void> login(User user, String accessToken) async {
+  Future<bool> login(User user, String accessToken) async {
     try {
           // print("${user.firstName} ${user.lastName} ${user.email} ${user.contact} ${user.id}");
-          print("access token: $accessToken");
+          // print("access token: $accessToken");
 
           // Save token in state
           state = state.copyWith(isAuthenticated: true, token: accessToken);
 
           // Persist token
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('authToken', accessToken);
           await prefs.setString('userId', user.id);
+          await prefs.setString('authToken', accessToken);
           await prefs.setString('firstName', user.firstName);
           await prefs.setString('lastName', user.lastName);
           await prefs.setString('email', user.email);
           await prefs.setString('contact', user.contact);
           await prefs.setString('role', 'user');
+          return true;
     } catch (e) {
       print(e);
+      return false;
     }
   }
 

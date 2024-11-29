@@ -1,7 +1,9 @@
+import 'dart:ffi';
+
 import 'package:equatable/equatable.dart';
 
 class Invitation extends Equatable {
-  final String id;
+  final int id;
   final String sentBy;
   final String projectId;
   final String guestId;
@@ -23,7 +25,7 @@ class Invitation extends Equatable {
       sentBy: json['invitationSendBy'],
       projectId: json['projectName'],
       guestId: json['guestID'],
-      role: json['role'] == 1? "MANAGER" : "TEAM MEMBER",
+      role: json['role'] == 1? "Manager" : "Team Member",
       message: json['message'],
     );
   }

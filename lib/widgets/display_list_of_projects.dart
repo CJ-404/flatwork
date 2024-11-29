@@ -49,7 +49,8 @@ class DisplayListOfProjects extends StatelessWidget {
               },
               onTap: () async {
                 ref.read(projectIdProvider.notifier).state = project.id.toString();
-                await AuthServices().setProjectRole(project.role?? "USER");
+                await AuthServices().setProjectRole(project.role!);
+                ref.invalidate(userDataProvider);
                 context.pushNamed(
                   RouteLocation.viewProject,
                   pathParameters: {'projectId': project.id.toString()},

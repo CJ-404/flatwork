@@ -46,7 +46,7 @@ class ManageProjectUsers extends ConsumerWidget {
 
 
     return Scaffold(
-      floatingActionButton: (currentUserData.value!["role"] == "TEAM MEMBER")?
+      floatingActionButton: (currentUserData.value!["role"] == "Team Member")?
       SizedBox.shrink()
       :
       FloatingActionButton(
@@ -96,7 +96,7 @@ class ManageProjectUsers extends ConsumerWidget {
                               final userRole = snapshot.data!;
                               return
                                 Row(
-                                  mainAxisAlignment: (userRole == "manager" || userRole == "OWNER")? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
+                                  mainAxisAlignment: (userRole == "Manager" || userRole == "OWNER")? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
                                   children: [
                                     IconButton(
                                       icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
@@ -105,7 +105,7 @@ class ManageProjectUsers extends ConsumerWidget {
                                         context.pushNamed(RouteLocation.login);
                                       },
                                     ),
-                                    (userRole == "manager" || userRole == "OWNER")?
+                                    (userRole == "Manager" || userRole == "OWNER")?
                                     PopupMenuButton<String>(
                                       icon: const Icon(
                                         Icons.more_vert,
@@ -307,8 +307,14 @@ class ManageProjectUsers extends ConsumerWidget {
                               ),
                               onTap: () async {
                                 // TODO: snack bar
-                                final result = await ApiServices().sendInvitation(currentUserData.value!["userId"]!, projectId, user.id, 2);
-                                (result)? Navigator.pop(context) : Navigator.pop(context);
+                                try{
+                                  final result = await ApiServices().sendInvitation(user.id, projectId, currentUserData.value!["userId"]!, 2);
+                                  (result)? Navigator.pop(context) : Navigator.pop(context);
+                                }
+                                catch(e) {
+                                  print(e);
+                                  Navigator.pop(context);
+                                }
                               },
                               enabled: !projectUsers.any((projectUser) => projectUser.id == user.id),
                             );
@@ -373,8 +379,8 @@ class ManageProjectUsers extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               RadioListTile<String>(
-                title: const Text('Member'),
-                value: 'Member',
+                title: const Text('Team Member'),
+                value: 'Team Member',
                 groupValue: _roleController.text,
                 onChanged: (String? value) {
                   if (value != null) {
@@ -387,7 +393,7 @@ class ManageProjectUsers extends ConsumerWidget {
               ),
               RadioListTile<String>(
                 title: const Text('Project Manager'),
-                value: 'Project Manager',
+                value: 'Manager',
                 groupValue: _roleController.text,
                 onChanged: (String? value) {
                   if (value != null) {

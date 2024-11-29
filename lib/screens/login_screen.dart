@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flatwork/config/config.dart';
 import 'package:flatwork/utils/utils.dart';
@@ -153,25 +154,28 @@ class LoginScreen extends ConsumerWidget {
           final accessToken = response['access_token'];
 
           ref.read(loadingProvider.notifier).state = false;
-          ref.read(authProvider.notifier).login(loggedUser, accessToken);
-          if(_scaffoldKey.currentState != null) {
-            ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(
-              const SnackBar(
-                content: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  // mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('Logged Successfully!'),
-                    SizedBox(width: 10),
-                    Icon(Icons.check_box_outlined, color: Colors.black54),
-                  ],
-                ),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
-          // ref.refresh(authProvider);
-          return true;
+          final authSaved = await ref.read(authProvider.notifier).login(loggedUser, accessToken);
+          if(authSaved)
+            {
+              if(_scaffoldKey.currentState != null) {
+                ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(
+                  const SnackBar(
+                    content: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Logged Successfully!'),
+                        SizedBox(width: 10),
+                        Icon(Icons.check_box_outlined, color: Colors.black54),
+                      ],
+                    ),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+              // ref.refresh(authProvider);
+              return true;
+            }
         }
         else{
           ref.read(loadingProvider.notifier).state = false;

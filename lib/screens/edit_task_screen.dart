@@ -46,8 +46,9 @@ class EditTaskScreen extends ConsumerWidget {
         data: (fetchedTask) {
           return userDataState.when(
           data: (userData){
+            // print(userData);
           Task task = fetchedTask;
-          final editAccess = (task.assignedUser?.id == userData["userId"] || userData["role"] == "MANAGER" || userData["role"] == "OWNER");
+          final editAccess = (task.assignedUser?.id == userData["userId"] || userData["role"] == "Manager" || userData["role"] == "OWNER");
 
           return Scaffold(
           key: scaffoldKey,

@@ -38,7 +38,7 @@ class Project extends Equatable {
       title: json['project_name'],
       description: json['project_description'] ?? "",
       progress: json['projectProgressStatus'] ?? 0.0,
-      role: json['role']?? "",
+      role: json['role']?? "Team Member",
     );
   }
 

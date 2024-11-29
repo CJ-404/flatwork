@@ -32,7 +32,6 @@ class ApiServices{
     ;
     if (response.statusCode == 200){
       final List result = jsonDecode(response.body)['data'];
-      // print(result);
       return result.map(((e) => Project.fromJson(e))).toList();
     }
     else {
@@ -88,7 +87,6 @@ class ApiServices{
           "Authorization": "Bearer $accessToken",
         },
     );
-    print(response.statusCode);
     if (response.statusCode == 200){
       final List result = jsonDecode(response.body)['data'];
       return result.map(((e) => Task.fromJson(e))).toList();
@@ -358,12 +356,12 @@ class ApiServices{
   }
 
   Future<bool> sendInvitation(String userId, String projectId, String invitedUserId, int role) async {
-    final url = Uri.parse("$endpoint/user/invite_to_member");
+    final url = Uri.parse("$endpoint/project/invite_to_member");
     final body =  jsonEncode({
       "userID": userId,
       "projectID": projectId,
       "invitedUserID": invitedUserId,
-      "role": role, // 1 = manager , 2 = team member
+      "role": role, // 1 = Manager , 2 = Team Member
     });
     Response response = await post(
       url,
@@ -542,7 +540,6 @@ class ApiServices{
     );
     if (response.statusCode == 200){
       final bool result = jsonDecode(response.body)['data'];
-      print(result);
       return true;
     }
     else {

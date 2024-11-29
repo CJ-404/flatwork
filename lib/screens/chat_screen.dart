@@ -95,7 +95,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                               final userRole = snapshot.data!;
                               return
                               Row(
-                                mainAxisAlignment: (userRole == "manager" || userRole == "OWNER")? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
+                                mainAxisAlignment: (userRole == "Manager" || userRole == "OWNER")? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
                                 children: [
                                   IconButton(
                                     icon: Icon(Icons.logout, color: colors.onPrimary,size: 30,),
@@ -104,7 +104,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                       context.pushNamed(RouteLocation.login);
                                     },
                                   ),
-                                  (userRole == "manager" || userRole == "OWNER")?
+                                  (userRole == "Manager" || userRole == "OWNER")?
                                     PopupMenuButton<String>(
                                       icon: const Icon(
                                         Icons.more_vert,

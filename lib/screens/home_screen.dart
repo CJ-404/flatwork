@@ -46,6 +46,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final fetchedCalendarTasks = ref.watch(userCalendarTasksProvider);
     final invitations = ref.watch(invitationProvider);
+    print(invitations);
 
     return MainScaffold(
       child: fetchedCalendarTasks.when(
@@ -133,7 +134,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       return NotificationTile(
                                         message: invitation.message,
                                         projectId: invitation.projectId,
-                                        id: invitation.id,
+                                        id: invitation.id.toString(),
                                         role: invitation.role,
                                       );
                                     }).toList(),
@@ -345,7 +346,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             TextButton(
               onPressed: ()
               async {
-                // TODO: set user role according to the project referring to
                 await AuthServices().setProjectRole(task.userRole);
                 Navigator.pop(context);
                 ref
