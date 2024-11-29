@@ -38,18 +38,10 @@ class ManageProjectUsers extends ConsumerWidget {
     final colors = context.colorScheme;
     final deviceSize = context.deviceSize;
     // final projectIdState = ref.watch(projectIdProvider);
+    final projectUsers2 = ref.watch(projectUserListProvider);
     final projectState = ref.watch(projectProvider);
     final tasksState = ref.watch(tasksProvider);
     final scaffoldKey = GlobalKey<ScaffoldState>();
-
-    // Dummy list of active chats with new message counts
-    final List<Map<String, dynamic>> projectUsers = [
-      {'userName': 'Alice','userId': '111', 'newMessages': 2},
-      {'userName': 'Bob','userId': '222', 'newMessages': 0},
-      {'userName': 'Charlie','userId': '333' , 'newMessages': 5},
-      {'userName': 'David','userId': '444', 'newMessages': 1},
-      {'userName': 'Eve','userId': '555', 'newMessages': 0},
-    ];
 
 
     return Scaffold(
@@ -57,7 +49,7 @@ class ManageProjectUsers extends ConsumerWidget {
         onPressed: () async {
           // Implement your function to write a message to a new user
           // TODO: dialog to select a new user to add to the project
-          showOverlayDialog(context,ref, projectUsers);
+          showOverlayDialog(context,ref, projectUsers2);
           // await showModalBottomSheet(
           //   // showDragHandle: true,
           //   context: context,
@@ -187,11 +179,11 @@ class ManageProjectUsers extends ConsumerWidget {
                               child:
                               ListView.separated(
                                 shrinkWrap: true,
-                                itemCount: projectUsers.length,
+                                itemCount: projectUsers2.length,
                                 itemBuilder: (ctx, index) {
-                                  final user = projectUsers[index];
-                                  final userName = user['userName'];
-                                  final userId = user['userId'];
+                                  final user = projectUsers2[index];
+                                  final userName = "${user.firstName} ${user.lastName}";
+                                  final userId = user.id;
 
                                   return ListTile(
                                     leading: CircleAvatar(
@@ -206,13 +198,14 @@ class ManageProjectUsers extends ConsumerWidget {
                                             TextSpan(
                                               text: userName,
                                             ),
-                                            TextSpan(
-                                              text: " (user@gmail.com)",
-                                              style: TextStyle(color: Colors.grey.shade700),
-                                            )
+                                            // TextSpan(
+                                            //   text: " (${user.email})",
+                                            //   style: TextStyle(color: Colors.grey.shade700),
+                                            // )
                                           ]
                                         )),
-                                        Text("role", style: TextStyle(color: Colors.grey),),
+                                        Text(user.email, style: TextStyle(color: Colors.grey, fontSize: 14),),
+                                        Text(user.role!, style: TextStyle(color: Colors.grey, fontSize: 14),),
                                       ],
                                     ),
                                     trailing: dotThree(context, ref, projectId, userId), // Show a badge if there are new messages
@@ -242,7 +235,7 @@ class ManageProjectUsers extends ConsumerWidget {
     );
   }
 
-  void showOverlayDialog(BuildContext context, WidgetRef ref, List<Map<String, dynamic>> projectUsers) async {
+  void showOverlayDialog(BuildContext context, WidgetRef ref, List<User> projectUsers) async {
     final deviceSize = context.deviceSize;
     TextEditingController searchController = TextEditingController();
 
@@ -251,7 +244,7 @@ class ManageProjectUsers extends ConsumerWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           contentPadding: const EdgeInsets.all(10),
-          title: Text('Select a user'),
+          title: Text('Select an user'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -302,15 +295,15 @@ class ManageProjectUsers extends ConsumerWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(user['name']!),
-                                  Text(user['email']!, style: TextStyle(color: Colors.grey),),
+                                  Text(user.firstName),
+                                  Text(user.email, style: TextStyle(color: Colors.grey),),
                                 ],
                               ),
                               onTap: () {
                                 // TODO: add the user as a member
                                 Navigator.pop(context);
                               },
-                              enabled: !projectUsers.any((projectUser) => projectUser['userId'] == user['userId']),
+                              enabled: !projectUsers.any((projectUser) => projectUser.id == user.id),
                             );
                           },
                           separatorBuilder: (BuildContext context, int index) {

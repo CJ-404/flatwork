@@ -1,28 +1,26 @@
 import 'package:flatwork/data/data.dart';
 import 'package:flatwork/data/models/invitation.dart';
 import 'package:flatwork/providers/api_service_provider.dart';
+import 'package:flatwork/services/api_services.dart';
 import 'package:flatwork/services/auth_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../project/projects_provider.dart';
 
-final AllUserListProvider = StateNotifierProvider.autoDispose<AllUserListNotifier, List<Map<String, String>>>(
-      (ref) => AllUserListNotifier(),
+final AllUserListProvider = StateNotifierProvider.autoDispose<AllUserListNotifier, List<User>>(
+      (ref) => AllUserListNotifier(ref),
 );
 
-class AllUserListNotifier extends StateNotifier<List<Map<String, String>>> {
-  final List<Map<String, String>> _allProjectUsers = [
-    {'userId': '111', 'name': 'Alice', 'email': 'qwe'},
-    {'userId': '2', 'name': 'Bob', 'email': 'wer'},
-    {'userId': '3', 'name': 'Charlie', 'email': 'ert'},
-    {'userId': '4', 'name': 'David', 'email': 'sdf'},
-    {'userId': '5', 'name': 'Eve', 'email': 'tyu'},
-  ];
+class AllUserListNotifier extends StateNotifier<List<User>> {
+  List<User> _allUsers = [];
 
-  AllUserListNotifier() : super([]) {
+  AllUserListNotifier(AutoDisposeStateNotifierProviderRef ref) : super([]) {
     // Initialize the state
-    state = _allProjectUsers;
-    //TODO: add the async function after backend is implemented
+    getUsers() async {
+      _allUsers = await ApiServices().getAllUsers();
+      state = _allUsers;
+    }
+    getUsers();
   }
 
   void filterAllUsers(String query) {
@@ -31,30 +29,29 @@ class AllUserListNotifier extends StateNotifier<List<Map<String, String>>> {
       state = [];
     } else {
       // Filter the list based on the query
-      state = _allProjectUsers
-          .where((user) => user['email']!.toLowerCase().contains(query.toLowerCase()))
+      state = _allUsers
+          .where((user) => user.email.toLowerCase().contains(query.toLowerCase()))
           .toList();
     }
   }
 }
 
-final projectUserListProvider = StateNotifierProvider.autoDispose<ProjectUserListNotifier, List<Map<String, String>>>(
-      (ref) => ProjectUserListNotifier(),
+final projectUserListProvider = StateNotifierProvider.autoDispose<ProjectUserListNotifier, List<User>>(
+      (ref) => ProjectUserListNotifier(ref),
 );
 
-class ProjectUserListNotifier extends StateNotifier<List<Map<String, String>>> {
-  final List<Map<String, String>> _allProjectUsers = [
-    {'userId': '111', 'name': 'AAlice', 'email': 'qwe'},
-    {'userId': '2', 'name': 'BBob', 'email': 'wer'},
-    {'userId': '3', 'name': 'CCharlie', 'email': 'ert'},
-    {'userId': '4', 'name': 'DDavid', 'email': 'sdf'},
-    {'userId': '5', 'name': 'EEve', 'email': 'tyu'},
-  ];
+class ProjectUserListNotifier extends StateNotifier<List<User>> {
+  List<User> _allProjectUsers = [];
 
-  ProjectUserListNotifier() : super([]) {
+  ProjectUserListNotifier(AutoDisposeStateNotifierProviderRef ref) : super([]) {
     // Initialize the state
-    state = _allProjectUsers;
-    //TODO: add the async function after backend is implemented
+    // state = _allProjectUsers;
+    final String projectId = ref.watch(projectIdProvider);
+    getUsers() async {
+      _allProjectUsers = await ApiServices().getProjectUsers(projectId);
+      state = _allProjectUsers;
+    }
+    getUsers();
   }
 
   void filterProjectUsers(String query) {
@@ -64,7 +61,7 @@ class ProjectUserListNotifier extends StateNotifier<List<Map<String, String>>> {
     } else {
       // Filter the list based on the query
       state = _allProjectUsers
-          .where((user) => user['email']!.toLowerCase().contains(query.toLowerCase()))
+          .where((user) => user.email.toLowerCase().contains(query.toLowerCase()))
           .toList();
     }
   }

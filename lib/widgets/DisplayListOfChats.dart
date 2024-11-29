@@ -14,26 +14,25 @@ class DisplayListOfChats extends StatelessWidget {
     super.key,
     required this.tasks,
     required this.projectId,
-    required this.ref
+    required this.ref,
+    required this.userId
   });
 
   final List<Task> tasks;
   final String projectId;
   final WidgetRef ref;
+  final String userId;
 
   @override
   Widget build(BuildContext context) {
     final deviceSize = context.deviceSize;
     const emptyTasksMessage = "There are no tasks yet";
-    // Dummy list of active chats with new message counts
-    final List<Map<String, dynamic>> activeChats = [
-      {'userName': 'Announcements', 'newMessages': 2},
-      {'userName': 'Bob', 'newMessages': 0},
-      {'userName': 'Charlie', 'newMessages': 5},
-      {'userName': 'David', 'newMessages': 0},
-      {'userName': 'Eve', 'newMessages': 1},
+    var projectUsers = ref.watch(projectUserListProvider);
+    projectUsers = [
+      User(id: "ffffff", firstName: "Announcements", lastName: "", email: "ffffff", contact: "ffffff"),
+      ...projectUsers
     ];
-
+    projectUsers = projectUsers.where((user) => user.id != userId).toList();
 
     return FutureBuilder<String>(
         future: AuthServices().getSavedUserRole(),
@@ -59,11 +58,11 @@ class DisplayListOfChats extends StatelessWidget {
                   :
               ListView.separated(
                 shrinkWrap: true,
-                itemCount: activeChats.length,
+                itemCount: projectUsers.length,
                 itemBuilder: (ctx, index) {
-                  final chat = activeChats[index];
-                  final userName = chat['userName'];
-                  final newMessages = chat['newMessages'];
+                  final chat = projectUsers[index];
+                  final userName = "${chat.firstName} ${chat.lastName}";
+                  final newMessages = 0; //chat.messages!;
 
                   return ListTile(
                         leading: CircleAvatar(
@@ -90,7 +89,7 @@ class DisplayListOfChats extends StatelessWidget {
                             pathParameters: {
                               'projectId': projectId.toString(),
                               'receiverName' : userName.toString(),
-                              'receiverId' : (userName == "Announcements")? "ffffff" : userName+"123".toString(),
+                              'receiverId' : chat.id,
                               'userId' : userId.toString(),
                             },
                           );

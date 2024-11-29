@@ -174,7 +174,7 @@ class ApiServices{
     }
   }
 
-  Future<List<User>> getAllUsers(String projectId) async {
+  Future<List<User>> getAllUsers() async {
     final url = Uri.parse("$endpoint/user/get_all_users");
     Response response = await get(
       url,

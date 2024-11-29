@@ -25,82 +25,11 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
 
-  // TODO: fetch tasks from backend
-  List<Task> dummyTasks = [
-    Task(
-      id: '1',
-      title: 'Task 1',
-      description: 'Complete initial design',
-      endDate: DateTime(2024, 4, 2),
-      isCompleted: false,
-      progress: 12.0,
-    ),
-    Task(
-      id: '2',
-      title: 'Task 2',
-      description: 'Submit project proposal',
-      endDate: DateTime(2024, 4, 10),
-      isCompleted: false,
-      progress: 12.0,
-    ),
-    Task(
-      id: '3',
-      title: 'Task 3',
-      description: 'Develop feature X',
-      endDate: DateTime(2024, 11, 5),
-      isCompleted: false,
-      progress: 12.0,
-    ),
-    Task(
-      id: '4',
-      title: 'Task 4',
-      description: 'Review design documents',
-      endDate: DateTime(2024, 5, 15),
-      isCompleted: true,
-      progress: 100.0,
-    ),
-    Task(
-      id: '5',
-      title: 'Task 5',
-      description: 'Team meeting',
-      endDate: DateTime(2024, 11, 25),
-      isCompleted: false,
-      progress: 12.0,
-    ),
-    Task(
-      id: '6',
-      title: 'Task 6',
-      description: 'Finalize budget Finalize budget Finalize budget Finalize budget Finalize budget',
-      endDate: DateTime(2024, 6, 1),
-      isCompleted: false,
-      progress: 12.0,
-    ),
-    Task(
-      id: '6',
-      title: 'Task 7',
-      description: 'Finalize budget Finalize budget Finalize budget Finalize budget Finalize budget',
-      endDate: DateTime(2024, 6, 1),
-      isCompleted: true,
-      progress: 100.0,
-    ),
-  ];
-
   DateTime selectedDay = DateTime.now();
   DateTime focusedDay = DateTime.now();
-  Map<DateTime, List<Task>> tasksByDate = {};
 
   @override
   void initState() {
-    for (var task in dummyTasks) {
-
-      DateTime dateKey = DateTime(task.endDate!.year, task.endDate!.month, task.endDate!.day);
-
-      if (tasksByDate.containsKey(dateKey)) {
-        tasksByDate[dateKey]!.add(task);
-      } else {
-        tasksByDate[dateKey] = [task];
-      }
-    }
     super.initState();
   }
 

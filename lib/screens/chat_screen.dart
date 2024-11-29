@@ -18,11 +18,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/auth_services.dart';
 import '../widgets/circular_progress_indicator.dart';
 
-class ChatScreen extends ConsumerWidget {
-  static ChatScreen builder(BuildContext context, GoRouterState state , String projectId)
-  => ChatScreen(
-    projectId: projectId,
-  );
+class ChatScreen extends ConsumerStatefulWidget {
+  static ChatScreen builder(BuildContext context, GoRouterState state,
+      String projectId) =>
+      ChatScreen(
+        projectId: projectId,
+      );
+
   const ChatScreen({
     super.key,
     required this.projectId,
@@ -31,21 +33,25 @@ class ChatScreen extends ConsumerWidget {
   final String projectId;
 
   @override
-  Widget build(BuildContext context, ref) {
+  _ChatScreenState createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends ConsumerState<ChatScreen> {
+  late Future<String> _userIdFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _userIdFuture = AuthServices().getSavedUserId();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.colorScheme;
     final deviceSize = context.deviceSize;
-    // final projectIdState = ref.watch(projectIdProvider);
+    // final activeChats = ref.watch(projectUserListProvider);
     final projectState = ref.watch(projectProvider);
     final tasksState = ref.watch(tasksProvider);
-
-    // Dummy list of active chats with new message counts
-    final List<Map<String, dynamic>> activeChats = [
-      {'userId':'111','userName': 'Alice', 'newMessages': 2},
-      {'userId':'222','userName': 'Bob', 'newMessages': 0},
-      {'userId':'333','userName': 'Charlie', 'newMessages': 5},
-      {'userId':'444','userName': 'David', 'newMessages': 1},
-      {'userId':'555','userName': 'Eve', 'newMessages': 0},
-    ];
 
 
     return Scaffold(
@@ -164,20 +170,34 @@ class ChatScreen extends ConsumerWidget {
                     data: (tasksState) {
                       List<Task> tasksList = tasksState.map((e) => e).toList();
 
-                      return SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            //TODO: integrate with firebase
-                            DisplayListOfChats(
-                              projectId: projectId,
-                              tasks: tasksList,
-                              ref: ref,
-                            ),
-                          ],
-                        ),
+                      return FutureBuilder<String>(
+                          future: _userIdFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Error: ${snapshot.error}'));
+                            } else {
+                              final userId = snapshot.data!;
+                              return SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment
+                                      .stretch,
+                                  children: [
+                                    //TODO: integrate with firebase
+                                    DisplayListOfChats(
+                                      projectId: widget.projectId,
+                                      tasks: tasksList,
+                                      ref: ref,
+                                      userId: userId,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                        }
                       );
                     },
                     // TODO: snakBar here
@@ -253,15 +273,15 @@ class ChatScreen extends ConsumerWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(user['name']!),
-                                  Text(user['email']!, style: TextStyle(color: Colors.grey),),
+                                  Text(user.firstName),
+                                  Text(user.email, style: TextStyle(color: Colors.grey),),
                                 ],
                               ),
                               onTap: () {
                                 // TODO: add the user as a member
                                 Navigator.pop(context);
                               },
-                              enabled: !activeUsers.any((projectUser) => projectUser['userId'] == user['userId']),
+                              enabled: !activeUsers.any((projectUser) => projectUser['userId'] == user.id),
                             );
                           },
                           separatorBuilder: (BuildContext context, int index) {
