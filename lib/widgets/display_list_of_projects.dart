@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flatwork/services/auth_services.dart';
 import 'package:flatwork/utils/utils.dart';
 import 'package:flatwork/widgets/widgets.dart';
@@ -45,9 +47,9 @@ class DisplayListOfProjects extends StatelessWidget {
               onLongPress: () {
                 //TODO: Delete Project
               },
-              onTap: () {
+              onTap: () async {
                 ref.read(projectIdProvider.notifier).state = project.id.toString();
-                AuthServices().setProjectRole(project.role?? "USER");
+                await AuthServices().setProjectRole(project.role?? "USER");
                 context.pushNamed(
                   RouteLocation.viewProject,
                   pathParameters: {'projectId': project.id.toString()},

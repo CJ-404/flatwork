@@ -80,6 +80,7 @@ class _SelectTeamMemberState extends ConsumerState<SelectTeamMember> {
                             assignedUsers: filterUsers(users,userFilter),
                             isSelect: true,
                             scaffoldKey: widget.scaffoldKey,
+                            parentRef: ref,
                           ),
                         ],
                       ),

@@ -29,7 +29,7 @@ class Task extends Equatable {
   factory Task.fromJson(Map<String, dynamic> json){
     // print(json['name'] == "null null");
     // print(json['user_Id'] == null);
-    User? assigned = (json['name'] == "null null" || json['user_Id'] == null)?
+    User? assigned = (json['name'] == null || json['user_Id'] == null)?
     null
         :
     User(id: json['user_Id'] ,firstName: json['name'], lastName: "", email: "", contact: "");

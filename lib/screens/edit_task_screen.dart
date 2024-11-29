@@ -18,14 +18,16 @@ import 'package:flatwork/providers/providers.dart';
 class EditTaskScreen extends ConsumerWidget {
   static EditTaskScreen builder(BuildContext context, GoRouterState state, String taskId)
   => EditTaskScreen(taskId: taskId);
-  const EditTaskScreen({super.key, required this.taskId});
+  EditTaskScreen({super.key, required this.taskId});
 
   final String taskId;
+
+  GlobalKey<ScaffoldState>? scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // final taskIdState = ref.watch(taskIdProvider);
-    final scaffoldKey = GlobalKey<ScaffoldState>();
+
     final fetchedTask = ref.watch(taskProvider);
     final progressValue = ref.watch(taskProgressProvider);
     final colors = context.colorScheme;
@@ -34,36 +36,41 @@ class EditTaskScreen extends ConsumerWidget {
     final loading = ref.watch(loadingProvider);
     final userDataState = ref.watch(userDataProvider);
 
-    return userDataState.when(
-        loading: () => CircularProgressIndicator(),
+    return fetchedTask.when(
+        loading: () => Scaffold(
+          body: const Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
         error: (err, stack) => Text("Error: $err"),
-        data: (userData) {
-          return fetchedTask.when(
-          data: (fetchedTask){
+        data: (fetchedTask) {
+          return userDataState.when(
+          data: (userData){
           Task task = fetchedTask;
           final editAccess = (task.assignedUser?.id == userData["userId"] || userData["role"] == "MANAGER" || userData["role"] == "OWNER");
 
           return Scaffold(
           key: scaffoldKey,
           appBar: AppBar(
-          backgroundColor: Colors.cyan,
-          title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-          DisplayWhiteText(
-          text: task.title.length <= maxTitleLength?
-          task.title
-              :
-          '${task.title.substring(0, maxTitleLength)}...',
-          fontSize: 20,),
-          IconButton(
-          icon: Icon(Icons.edit_document, color: colors.onPrimary,size: 30,),
-          onPressed: () {
-          showOverlayDialog(context, ref, editAccess);
-          },
-          ),
-          ],
-          ),
+            backgroundColor: Colors.cyan,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                DisplayWhiteText(
+                  text: task.title.length <= maxTitleLength?
+                  task.title
+                      :
+                  '${task.title.substring(0, maxTitleLength)}...',
+                  fontSize: 20,
+                ),
+                IconButton(
+                  icon: Icon(Icons.edit_document, color: colors.onPrimary,size: 30,),
+                  onPressed: () {
+                    showOverlayDialog(context, ref, editAccess);
+                  },
+                ),
+              ],
+            ),
           ),
           body: SafeArea(
           child: Padding(
@@ -81,7 +88,7 @@ class EditTaskScreen extends ConsumerWidget {
           [
           Padding(
           padding: const EdgeInsets.all(8.0),
-          child: const Text("uploading.. please wait!"),
+          child: const Text("please wait!"),
           ),
           const Center(
           child: CircularProgressIndicator(),
@@ -188,13 +195,21 @@ class EditTaskScreen extends ConsumerWidget {
           IconButton(
           onPressed: () async {
           ref.read(userFilterProvider.notifier).state = "";
-          await showModalBottomSheet(
+          final User assignedUser = await showModalBottomSheet(
+          // isDismissible: false, // Prevents closing by tapping outside
+          // enableDrag: false, // Disables swipe-to-dismiss
           // showDragHandle: true,
           context: context,
           builder: (ctx) {
-          return SelectTeamMember(assignedMembers: task.assignedUser==null? []:[task.assignedUser!],scaffoldKey: scaffoldKey,);
+          return SelectTeamMember(assignedMembers: task.assignedUser==null? []:[task.assignedUser!],scaffoldKey: scaffoldKey!,);
           },
           );
+
+          await _assignUser(assignedUser, ref);
+          ref
+              .read(userFilterProvider.notifier)
+              .state = "";
+          ref.refresh(taskProvider);
           },
           icon: Icon(
           Icons.add,
@@ -229,7 +244,8 @@ class EditTaskScreen extends ConsumerWidget {
           children: [
           DisplayListOfUsers(
           assignedUsers: task.assignedUser == null? [] : [task.assignedUser!],
-          scaffoldKey: scaffoldKey,
+          scaffoldKey: scaffoldKey!,
+            parentRef: ref,
           ),
           ],
           ),
@@ -242,13 +258,94 @@ class EditTaskScreen extends ConsumerWidget {
           ),
           );
           },
-          error: (error,s) => Text(error.toString()),
-          loading: () =>  const Center(
-          child: CircularProgressIndicator(),
+          error: (error,s) => Text(error.toString() ),
+          loading: () =>  Scaffold(
+            body: const Center(
+              child: CircularProgressIndicator(),
+            ),
           ),
           );
         },
     );
+  }
+
+  Future<bool> _assignUser(User user, WidgetRef ref) async {
+
+    ref.read(loadingProvider.notifier).state = true;
+    try{
+      final String taskId = ref.watch(taskIdProvider);
+      final response = await ApiServices().assignTeamMember(
+        user,
+        taskId,
+      );
+      if(response){
+        ref.read(loadingProvider.notifier).state = false;
+        if( scaffoldKey!.currentState != null) {
+          ScaffoldMessenger.of(scaffoldKey!.currentContext!).showSnackBar(
+            const SnackBar(
+              content: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('New team member added!'),
+                  SizedBox(width: 10),
+                  Icon(Icons.check_box_outlined, color: Colors.black54),
+                ],
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+        return true;
+      }
+      else{
+        ref.read(loadingProvider.notifier).state = false;
+        if(scaffoldKey?.currentState != null) {
+          ScaffoldMessenger.of(scaffoldKey!.currentContext!).showSnackBar(
+            const SnackBar(
+              content: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Check your Network Connection and Try Again'),
+                  SizedBox(width: 10),
+                  Icon(Icons.error_outline_rounded, color: Colors.black54),
+                ],
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+    catch (e){
+      // print(e.toString());
+      ref.read(loadingProvider.notifier).state = false;
+      final errorMessage = e.toString();
+      if(scaffoldKey?.currentState != null) {
+        ScaffoldMessenger.of(scaffoldKey!.currentContext!).showSnackBar(
+          SnackBar(
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  errorMessage,
+                  style: const TextStyle(
+                      fontSize: 8
+                  ),
+                ),
+                const SizedBox(width: 10),
+                const Icon(Icons.error_outline_rounded, color: Colors.black54),
+              ],
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+
+    return false;
   }
 
   void _getPermissionOverlay(BuildContext context, WidgetRef ref, FilePickerResult pickedFile) async {
@@ -407,7 +504,7 @@ class EditTaskScreen extends ConsumerWidget {
                   //list of shared files
                   SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(20),
+                    // padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [

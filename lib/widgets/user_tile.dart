@@ -49,8 +49,8 @@ class UserTile extends StatelessWidget {
           ),
         ),
         !isSelect!? InkWell(
-          onTap: (){
-            onDelete!();
+          onTap: () async {
+            await onDelete!();
           },
           child: const Icon(
             Icons.delete_outline,

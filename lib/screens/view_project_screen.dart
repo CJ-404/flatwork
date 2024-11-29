@@ -49,7 +49,7 @@ class ViewProjectScreen extends ConsumerWidget {
                   FutureBuilder<String>(
                       future: AuthServices().getSavedUserRole(),
                     builder: (context, snapshot) {
-                      final userRole = snapshot.data!;
+                      final userRole = snapshot.data;
                       final bool adminAccess = (userRole == "OWNER" || userRole == "MANAGER");
 
                       if (snapshot.connectionState == ConnectionState.waiting) {
@@ -270,13 +270,21 @@ class ViewProjectScreen extends ConsumerWidget {
               // TODO: snakBar here
               error: (error,s) => Scaffold( body: Center(child: Text(error.toString())), appBar: AppBar(),),
               loading: () =>  const Center(
-                child: CircularProgressIndicator(),
+                child: Scaffold(
+                  body: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
               ),
           );
         },
         error: (error,s) => Scaffold( body: Center(child: Text(error.toString())), appBar: AppBar(),),
         loading: () =>  const Center(
-          child: CircularProgressIndicator(),
+          child: Scaffold(
+            body: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
         ),
     );
   }
