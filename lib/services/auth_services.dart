@@ -11,6 +11,7 @@ class AuthServices{
     final email = prefs.getString('email');
     final role = prefs.getString('role');
     final userId = prefs.getString('userId');
+    final contact = prefs.getString('contact');
     return {
       'token': token,
       'firstName': firstName,
@@ -18,6 +19,7 @@ class AuthServices{
       'email': email,
       'role': role,
       'userId': userId,
+      'contact': contact,
     };
   }
 

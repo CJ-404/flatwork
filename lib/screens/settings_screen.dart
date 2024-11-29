@@ -72,7 +72,41 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                           const Gap(2),
                           Text(
-                            "change user profile & preferences",
+                            "change user profile",
+                            style: context.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 17,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: (){
+                      context.pushNamed(RouteLocation.editPassword);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        top: 0,
+                        bottom: 10,
+                        right: 10,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Password Change",
+                            style: context.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                            ),
+                          ),
+                          const Gap(2),
+                          Text(
+                            "change user password",
                             style: context.textTheme.headlineSmall?.copyWith(
                               fontWeight: FontWeight.w500,
                               fontSize: 17,

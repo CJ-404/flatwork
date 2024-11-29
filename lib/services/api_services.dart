@@ -462,9 +462,10 @@ class ApiServices{
       },
       body: body,
     );
+    print(body);
     if (response.statusCode == 200 || response.statusCode == 201){
-      // final List result = jsonDecode(response.body)['data'];
-      return true;
+      final bool result = jsonDecode(response.body)['data'];
+      return result;
     }
     else {
       throw Exception(response.reasonPhrase);

@@ -13,50 +13,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flatwork/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class EditProfile extends ConsumerStatefulWidget {
+class EditPassword extends ConsumerStatefulWidget {
 
-  static EditProfile builder(BuildContext context, GoRouterState state)
-  => const EditProfile();
-  const EditProfile({super.key});
+  static EditPassword builder(BuildContext context, GoRouterState state)
+  => const EditPassword();
+  const EditPassword({super.key});
 
   @override
-  ConsumerState<EditProfile> createState() => _EditProfileState();
+  ConsumerState<EditPassword> createState() => _EditPasswordState();
 }
 
-class _EditProfileState extends ConsumerState<EditProfile> {
+class _EditPasswordState extends ConsumerState<EditPassword> {
 
-  // final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
-  // final TextEditingController _emailController = TextEditingController();
-  late TextEditingController _mobileController;
-  late TextEditingController _fnameController;
-  late TextEditingController _lnameController;
-  // final TextEditingController _passwordController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    final userData = ref.read(userDataProvider);
-    print("${userData.value}");
-    _fnameController = TextEditingController(text: userData.value!["firstName"]);
-    _lnameController = TextEditingController(text: userData.value!["lastName"]);
-    _mobileController = TextEditingController(text: "${userData.value!["contact"]}");
-  }
+  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
 
   @override
   void dispose() {
-    // _emailController.dispose();
-    _mobileController.dispose();
-    _fnameController.dispose();
-    _lnameController.dispose();
-    // _passwordController.dispose();
+    _oldPasswordController.dispose();
+    _newPasswordController.dispose();
     super.dispose();
   }
-
-
-  // final loading = ref.watch(loadingProvider);
-  // final colors = context.colorScheme;
-  // final deviceSize = context.deviceSize;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +43,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: const Text('Edit Password'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -74,93 +52,43 @@ class _EditProfileState extends ConsumerState<EditProfile> {
           Center(
             child: CircularProgressIndicator(),
           )
-              :
+          :
           Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Center(
-                //   child: Stack(
-                //     children: [
-                //       CircleAvatar(
-                //         radius: 50,
-                //         backgroundImage: AssetImage('images/default_profile.webp'),
-                //         // Replace with user's profile image, if available
-                //       ),
-                //       Positioned(
-                //         bottom: 0,
-                //         right: 0,
-                //         child: GestureDetector(
-                //           onTap: () async {
-                //             FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
-                //               type: FileType.custom,
-                //               allowedExtensions: ['jpg','jpeg','png'],
-                //             );
-                //             // if (pickedFile == null) return;
-                //             // File file = File(result.files.single.path!);
-                //             // final selectedFile = result.files.first;
-                //             // _getPermissionOverlay(context, ref, pickedFile);
-                //           },
-                //           child: CircleAvatar(
-                //             radius: 15,
-                //             backgroundColor: Colors.blue,
-                //             child: Icon(
-                //               Icons.camera_alt,
-                //               color: Colors.white,
-                //               size: 18,
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 TextFormField(
-                  // initialValue: userData.value?['firstName']?? "",
-                  controller: _fnameController,
+                  controller: _oldPasswordController,
                   decoration: const InputDecoration(
-                    labelText: 'First Name',
+                    labelText: 'Old Password',
                     border: OutlineInputBorder(),
+                    suffixIcon: Icon(Icons.visibility),
                   ),
+                  obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your first name';
+                      return 'Please enter your old password';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  // initialValue: userData.value?['lastName']?? "",
-                  controller: _lnameController,
+                  controller: _newPasswordController,
                   decoration: const InputDecoration(
-                    labelText: 'Last Name',
+                    labelText: 'New Password',
                     border: OutlineInputBorder(),
+                    suffixIcon: Icon(Icons.visibility),
                   ),
+                  obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your last name';
+                      return 'Please enter your new password';
                     }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  // initialValue: userData.value?['contact']?? "",
-                  controller: _mobileController,
-                  decoration: const InputDecoration(
-                    labelText: 'Mobile Number',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.phone,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your mobile number';
-                    }
-                    if (!RegExp(r'^\d{10,}$').hasMatch(value)) {
-                      return 'Please enter a valid mobile number';
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters long';
                     }
                     return null;
                   },
@@ -173,28 +101,21 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                       if (_formKey.currentState!.validate()) {
                         // Handle form submission
                         try{
-                          final prefs = await SharedPreferences.getInstance();
-                          await prefs.setString('firstName', _fnameController.text);
-                          await prefs.setString('lastName', _lnameController.text);
-                          await prefs.setString('contact', _mobileController.text);
-                          final result = await ApiServices().updateUser(
+                          final result = await ApiServices().updatePassword(
                               userData.value!["userId"]!,
-                              _fnameController.text,
-                              _lnameController.text,
-                              _mobileController.text
+                              _oldPasswordController.text,
+                              _newPasswordController.text
                           );
                           ref.read(loadingProvider.notifier).state = false;
                           if(result)
                             {
-                              ref.invalidate(userDataProvider);
-                              ref.refresh(userDataProvider);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     // mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text('Profile updated successfully'),
+                                      Text('Password changed successfully'),
                                       SizedBox(width: 10),
                                       Icon(Icons.check_box_outlined, color: Colors.black54),
                                     ],
@@ -211,7 +132,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   // mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text('Check your changes again'),
+                                    Text('Old Password is incorrect'),
                                     SizedBox(width: 10),
                                     Icon(Icons.error_outline_rounded, color: Colors.black54),
                                   ],
