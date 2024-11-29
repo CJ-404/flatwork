@@ -189,6 +189,7 @@ class ManageProjectUsers extends ConsumerWidget {
                                   final userName = "${user.firstName} ${user.lastName}";
                                   final userId = user.id;
                                   final currentUserData = ref.watch(userDataProvider);
+                                  _roleController.text = user.role!;
 
                                   return ListTile(
                                     leading: CircleAvatar(
@@ -213,7 +214,10 @@ class ManageProjectUsers extends ConsumerWidget {
                                         Text(user.role!, style: TextStyle(color: Colors.grey, fontSize: 14),),
                                       ],
                                     ),
-                                    trailing: ((userId == currentUserData.value!["userId"]) || currentUserData.value!["role"] != "OWNER")? SizedBox.shrink() : dotThree(context, ref, projectId, userId), // Show a badge if there are new messages
+                                    trailing: ((userId == currentUserData.value!["userId"]) || currentUserData.value!["role"] != "OWNER")?
+                                    SizedBox.shrink()
+                                        :
+                                    dotThree(context, ref, projectId, userId, user.role!), // Show a badge if there are new messages
                                     onTap: () {
                                       // do nothing
                                     },
@@ -340,7 +344,7 @@ class ManageProjectUsers extends ConsumerWidget {
     );
   }
 
-  Widget dotThree(BuildContext context, WidgetRef ref, String projectId , String userId) {
+  Widget dotThree(BuildContext context, WidgetRef ref, String projectId , String userId, String userRole) {
       return PopupMenuButton<String>(
         icon: const Icon(
           Icons.more_vert,
@@ -351,7 +355,7 @@ class ManageProjectUsers extends ConsumerWidget {
           if (value == 'delete') {
             showDeleteOverlayDialog(context, ref, projectId, userId);
           } else if (value == 'change role') {
-            showRoleChangeOverlayDialog(context, ref, projectId, userId);
+            showRoleChangeOverlayDialog(context, ref, projectId, userId, userRole);
           }
         },
         itemBuilder: (context) => [
@@ -368,7 +372,7 @@ class ManageProjectUsers extends ConsumerWidget {
     }
 
   void showRoleChangeOverlayDialog(
-      BuildContext context,WidgetRef ref, String projectId, String userId) {
+      BuildContext context,WidgetRef ref, String projectId, String userId, String userRole) {
 
     showDialog(
       context: context,
@@ -381,26 +385,28 @@ class ManageProjectUsers extends ConsumerWidget {
               RadioListTile<String>(
                 title: const Text('Team Member'),
                 value: 'Team Member',
+                selected: userRole == 'Team Member',
                 groupValue: _roleController.text,
                 onChanged: (String? value) {
                   if (value != null) {
                     _roleController.text = value;
                     // Rebuild the dialog to reflect the change.
                     Navigator.of(context).pop();
-                    showRoleChangeOverlayDialog(context, ref, projectId, userId);
+                    showRoleChangeOverlayDialog(context, ref, projectId, userId, userRole);
                   }
                 },
               ),
               RadioListTile<String>(
                 title: const Text('Project Manager'),
                 value: 'Manager',
+                selected: userRole == 'Manager',
                 groupValue: _roleController.text,
                 onChanged: (String? value) {
                   if (value != null) {
                     _roleController.text = value;
                     // Rebuild the dialog to reflect the change.
                     Navigator.of(context).pop();
-                    showRoleChangeOverlayDialog(context, ref, projectId, userId);
+                    showRoleChangeOverlayDialog(context, ref, projectId, userId, userRole);
                   }
                 },
               ),
@@ -408,13 +414,31 @@ class ManageProjectUsers extends ConsumerWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                  ref.invalidate(projectUserListProvider);
+                  Navigator.pop(context);
+                },
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                // TODO: Add save logic here.
-                Navigator.pop(context);
+              onPressed: () async {
+                try{
+                  final role = _roleController.text == "Manager"? 1 : 2;
+                  final ownerId = await AuthServices().getSavedUserId();
+                  final result = await ApiServices().updateUserRole(ownerId, userId, projectId, role);
+                  if(result)
+                    {
+                      ref.invalidate(AllUserListProvider);
+                      ref.invalidate(projectUserListProvider);
+                      Navigator.pop(context);
+                    }
+                  else{
+                    print("Server error : 405");
+                  }
+                } catch (e)
+                {
+                  print(e.toString());
+                }
               },
               child: const Text('Save'),
             ),

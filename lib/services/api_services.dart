@@ -498,7 +498,7 @@ class ApiServices{
   }
 
   Future<bool> updateUserRole(String ownerUserId, String userId, String projectId, int role ) async {
-    final url = Uri.parse("$endpoint/user/update_user");
+    final url = Uri.parse("$endpoint/user/change_user_role");
     final body =  jsonEncode({
       "projectOwnerID": ownerUserId,
       "userID": userId,
