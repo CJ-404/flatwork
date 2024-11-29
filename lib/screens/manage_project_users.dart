@@ -184,6 +184,7 @@ class ManageProjectUsers extends ConsumerWidget {
                                   final user = projectUsers2[index];
                                   final userName = "${user.firstName} ${user.lastName}";
                                   final userId = user.id;
+                                  final currentUserData = ref.watch(userDataProvider);
 
                                   return ListTile(
                                     leading: CircleAvatar(
@@ -208,7 +209,7 @@ class ManageProjectUsers extends ConsumerWidget {
                                         Text(user.role!, style: TextStyle(color: Colors.grey, fontSize: 14),),
                                       ],
                                     ),
-                                    trailing: dotThree(context, ref, projectId, userId), // Show a badge if there are new messages
+                                    trailing: ((userId == currentUserData.value!["userId"]) || currentUserData.value!["role"] != "OWNER")? SizedBox.shrink() : dotThree(context, ref, projectId, userId), // Show a badge if there are new messages
                                     onTap: () {
                                       // do nothing
                                     },
