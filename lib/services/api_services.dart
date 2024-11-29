@@ -363,7 +363,7 @@ class ApiServices{
       "userID": userId,
       "projectID": projectId,
       "invitedUserID": invitedUserId,
-      "role": role, // 1 , 2
+      "role": role, // 1 = manager , 2 = team member
     });
     Response response = await post(
       url,

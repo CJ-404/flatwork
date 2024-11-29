@@ -41,11 +41,15 @@ class ManageProjectUsers extends ConsumerWidget {
     final projectUsers2 = ref.watch(projectUserListProvider);
     final projectState = ref.watch(projectProvider);
     final tasksState = ref.watch(tasksProvider);
+    final currentUserData = ref.watch(userDataProvider);
     final scaffoldKey = GlobalKey<ScaffoldState>();
 
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: (currentUserData.value!["role"] == "TEAM MEMBER")?
+      SizedBox.shrink()
+      :
+      FloatingActionButton(
         onPressed: () async {
           // Implement your function to write a message to a new user
           // TODO: dialog to select a new user to add to the project
@@ -239,6 +243,7 @@ class ManageProjectUsers extends ConsumerWidget {
   void showOverlayDialog(BuildContext context, WidgetRef ref, List<User> projectUsers) async {
     final deviceSize = context.deviceSize;
     TextEditingController searchController = TextEditingController();
+    final currentUserData = ref.watch(userDataProvider);
 
     showDialog(
       context: context,
@@ -300,9 +305,10 @@ class ManageProjectUsers extends ConsumerWidget {
                                   Text(user.email, style: TextStyle(color: Colors.grey),),
                                 ],
                               ),
-                              onTap: () {
-                                // TODO: add the user as a member
-                                Navigator.pop(context);
+                              onTap: () async {
+                                // TODO: snack bar
+                                final result = await ApiServices().sendInvitation(currentUserData.value!["userId"]!, projectId, user.id, 2);
+                                (result)? Navigator.pop(context) : Navigator.pop(context);
                               },
                               enabled: !projectUsers.any((projectUser) => projectUser.id == user.id),
                             );
