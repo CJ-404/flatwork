@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
 
 class CalendarTask extends Equatable {
-  final String deadline;
-  final int progress;
+  final DateTime deadline;
+  final double progress;
   final String userRole;
   final String name;
   final String taskDescription;
-  final String taskCreatedDate;
+  final DateTime taskCreatedDate;
   final String projectName;
   final String userId;
   final String taskId;
@@ -29,17 +29,17 @@ class CalendarTask extends Equatable {
 
   factory CalendarTask.fromJson(Map<String, dynamic> json){
     return CalendarTask(
-         deadline : json[''],
-         progress : json[''],
-         userRole : json[''],
-         name : json[''],
-         taskDescription : json[''],
-         taskCreatedDate : json[''],
-         projectName : json[''],
-         userId : json[''],
-         taskId : json[''],
-         taskName : json[''],
-         projectId : json[''],
+         deadline : DateTime.parse(json['deadlineDate']),
+         progress : json['progressStatus'],
+         userRole : json['userRole'],
+         name : json['name'],
+         taskDescription : json['task_Description'],
+         taskCreatedDate : DateTime.parse(json['task_created_Date']),
+         projectName : json['project_Name'],
+         userId : json['user_Id'],
+         taskId : json['task_Id'],
+         taskName : json['task_Name'],
+         projectId : json['project_Id'],
     );
   }
 

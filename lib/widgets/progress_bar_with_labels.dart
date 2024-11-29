@@ -39,6 +39,7 @@ class ProgressBarWithLabels extends ConsumerWidget {
               label: progressValue.round().toString(),
               onChanged: (double value) async {
                 if(editAccess) {
+                  ref.invalidate(userCalendarTasksProvider);
                   // Update the progress value using state management
                   try {
                     print("new progress updated: $value");
@@ -47,7 +48,7 @@ class ProgressBarWithLabels extends ConsumerWidget {
                     ref
                         .read(taskProgressProvider.notifier)
                         .state = value;
-                    ref.invalidate(tasksProvider);
+                    ref.invalidate(taskProvider);
                     ref.invalidate(projectProvider);
                     print("updated progress!");
                   }

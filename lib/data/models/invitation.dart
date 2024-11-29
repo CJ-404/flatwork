@@ -5,7 +5,7 @@ class Invitation extends Equatable {
   final String sentBy;
   final String projectId;
   final String guestId;
-  final String? role;
+  final String role;
   final String message;
 
   const Invitation( {
@@ -13,7 +13,7 @@ class Invitation extends Equatable {
     required this.sentBy,
     required this.projectId,
     required this.guestId,
-    this.role,
+    required this.role,
     required this.message,
   });
 
@@ -23,7 +23,7 @@ class Invitation extends Equatable {
       sentBy: json['invitationSendBy'],
       projectId: json['projectName'],
       guestId: json['guestID'],
-      role: json['role'],
+      role: json['role'] == 1? "MANAGER" : "TEAM MEMBER",
       message: json['message'],
     );
   }
