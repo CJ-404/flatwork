@@ -268,13 +268,13 @@ class ViewProjectScreen extends ConsumerWidget {
                   );
               },
               // TODO: snakBar here
-              error: (error,s) => Text(error.toString()),
+              error: (error,s) => Scaffold( body: Center(child: Text(error.toString())), appBar: AppBar(),),
               loading: () =>  const Center(
                 child: CircularProgressIndicator(),
               ),
           );
         },
-        error: (error,s) => Text(error.toString()),
+        error: (error,s) => Scaffold( body: Center(child: Text(error.toString())), appBar: AppBar(),),
         loading: () =>  const Center(
           child: CircularProgressIndicator(),
         ),

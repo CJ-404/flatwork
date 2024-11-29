@@ -94,7 +94,7 @@ class _ProjectScreenState extends ConsumerState<ProjectScreen> {
                           );
                         },
                         //TODO: snakBar here
-                        error: (error,s) => Text(error.toString()),
+                        error: (error,s) => Center(child: Text(error.toString())),
                         loading: () =>  const Center(
                           child: CircularProgressIndicator(),
                         ),
