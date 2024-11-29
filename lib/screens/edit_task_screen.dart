@@ -233,11 +233,7 @@ class EditTaskScreen extends ConsumerWidget {
           thickness: 1,
           color: Colors.black,
           ),
-          ConstrainedBox(
-          constraints: BoxConstraints(
-          minHeight: 100,
-          ),
-          child: Column(
+          Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
@@ -248,7 +244,6 @@ class EditTaskScreen extends ConsumerWidget {
             parentRef: ref,
           ),
           ],
-          ),
           ),
           ],
           ),
