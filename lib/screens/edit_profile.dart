@@ -38,9 +38,9 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     super.initState();
     final userData = ref.read(userDataProvider);
     print("${userData.value}");
-    _fnameController = TextEditingController(text: userData.value!["firstName"]);
-    _lnameController = TextEditingController(text: userData.value!["lastName"]);
-    _mobileController = TextEditingController(text: "${userData.value!["contact"]}");
+    _fnameController = TextEditingController(text: userData.value?["firstName"]);
+    _lnameController = TextEditingController(text: userData.value?["lastName"]);
+    _mobileController = TextEditingController(text: "${userData.value?["contact"]}");
   }
 
   @override

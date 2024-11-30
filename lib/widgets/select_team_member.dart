@@ -37,61 +37,63 @@ class _SelectTeamMemberState extends ConsumerState<SelectTeamMember> {
 
   @override
   Widget build(BuildContext context) {
-    //TODO: fetch all users from the backend
     final fetchedUsers = ref.watch(usersProvider);
 
     final userFilter = ref.watch(userFilterProvider);
     // final TextEditingController filterController = TextEditingController();
 
-    return SafeArea(
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(20.0),
-        child: Padding(
-          padding: const EdgeInsets.only(
-            left: 16,
-            top: 10,
-            bottom: 10,
-            right: 10,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CommonTextField(
-                  // controller: filterController,
-                  title: "Search by email",
-                  hintText: userFilter==""? "Enter an email" : userFilter,
-                  onChange: (value) {
-                    //change userFilter
-                    ref.read(userFilterProvider.notifier).state = value;
-                  },
-              ),
-              fetchedUsers.when(
-                  data: (fetchedUsers){
-                    List<User> users = fetchedUsers;
-                    return SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          DisplayListOfUsers(
-                            assignedUsers: filterUsers(users,userFilter),
-                            isSelect: true,
-                            scaffoldKey: widget.scaffoldKey,
-                            parentRef: ref,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  error: (err, s) => Text(err.toString()),
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(),
-                  )
-              ),
-            ],
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(20.0),
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: 16,
+              top: 10,
+              bottom: 10,
+              right: 10,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CommonTextField(
+                    // controller: filterController,
+                    title: "Search by email",
+                    hintText: userFilter==""? "Enter an email" : userFilter,
+                    onChange: (value) {
+                      //change userFilter
+                      ref.read(userFilterProvider.notifier).state = value;
+                    },
+                ),
+                fetchedUsers.when(
+                    data: (fetchedUsers){
+                      List<User> users = fetchedUsers;
+                      return SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            DisplayListOfUsers(
+                              assignedUsers: filterUsers(users,userFilter),
+                              isSelect: true,
+                              scaffoldKey: widget.scaffoldKey,
+                              parentRef: ref,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    error: (err, s) => Text(err.toString()),
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -272,7 +272,7 @@ class SignupScreen extends ConsumerStatefulWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 // mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Server error!'),
+                  Text('Existing user! use different values'),
                   SizedBox(width: 10),
                   Icon(Icons.error_outline_rounded, color: Colors.black54),
                 ],
@@ -295,7 +295,7 @@ class SignupScreen extends ConsumerStatefulWidget {
               // mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  errorMessage,
+                  errorMessage?? "Internal server error",
                   style: const TextStyle(
                       fontSize: 8
                   ),

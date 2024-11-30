@@ -209,7 +209,7 @@ class LoginScreen extends ConsumerWidget {
                 // mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    errorMessage,
+                    errorMessage?? "check ypu network connection",
                     style: const TextStyle(
                         fontSize: 8
                     ),

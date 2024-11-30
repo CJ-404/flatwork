@@ -112,7 +112,7 @@ class EditTaskScreen extends ConsumerWidget {
           color: Colors.black,
           ),
           Text(
-          task.description,
+          "${task.description}\nend date: ${'${DateTime.parse(task.endDate!).year}-${DateTime.parse(task.endDate!).month.toString().padLeft(2, '0')}-${DateTime.parse(task.endDate!).day.toString().padLeft(2, '0')}'}",
           style: context.textTheme.headlineSmall?.copyWith(
           fontWeight: FontWeight.w500,
           fontSize: 18,
@@ -326,7 +326,7 @@ class EditTaskScreen extends ConsumerWidget {
               // mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  errorMessage,
+                  errorMessage?? "Internal server error",
                   style: const TextStyle(
                       fontSize: 8
                   ),
@@ -388,23 +388,43 @@ class EditTaskScreen extends ConsumerWidget {
                           // send link to the backend
                           // if not created, exception will pop
                           final created = await ApiServices().createTaskFile(taskId, pickedFile.files.first.name, uploadedUrl);
-                          // TODO: refresh getting shared files ref
+
                           // for now just pop from context to load again by taping
                           ref.read(loadingProvider.notifier).state = false;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                // mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text("file uploaded!"),
-                                  SizedBox(width: 10),
-                                  Icon(Icons.check_box_outlined, color: Colors.black54),
-                                ],
-                              ),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
+                          if(created)
+                            {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    // mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text("file uploaded!"),
+                                      SizedBox(width: 10),
+                                      Icon(Icons.check_box_outlined, color: Colors.black54),
+                                    ],
+                                  ),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                          else
+                            {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    // mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text("Check your network connection"),
+                                      SizedBox(width: 10),
+                                      Icon( Icons.error_outline_rounded , color: Colors.black54),
+                                    ],
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
                         }
                         catch (e){
                           print('error: $e');
@@ -415,7 +435,7 @@ class EditTaskScreen extends ConsumerWidget {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 // mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text("file not uploaded! error occurred"),
+                                  Text("file not uploaded! Internal server error"),
                                   SizedBox(width: 10),
                                   Icon( Icons.error_outline_rounded , color: Colors.black54),
                                 ],
@@ -529,7 +549,7 @@ class EditTaskScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             // mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Check your connection!"),
+              Text("Check your network connection!"),
               SizedBox(width: 10),
               Icon( Icons.error_outline_rounded , color: Colors.black54),
             ],

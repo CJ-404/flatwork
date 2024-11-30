@@ -48,6 +48,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final invitations = ref.watch(invitationProvider);
     print(invitations);
 
+    final loading = ref.read(loadingProvider);
+
     return MainScaffold(
       child: fetchedCalendarTasks.when(
         loading: () => Scaffold(
@@ -123,7 +125,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             Divider(thickness: 2),
                             //notifications
                             Expanded(
-                              child: (invitations.isEmpty)?
+                              child:
+                                  loading?
+                                      Center(
+                                        child: CircularProgressIndicator(),
+                                      )
+                                      :
+                              (invitations.isEmpty)?
                               Text("No messages")
                               :
                               SingleChildScrollView(

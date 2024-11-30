@@ -10,7 +10,7 @@ class Task extends Equatable {
   final bool isCompleted;
   final double? progress;
   // final String time;
-  final DateTime? endDate;
+  final String? endDate;
 
   const Task({
     this.id,
@@ -42,7 +42,7 @@ class Task extends Equatable {
       // assignedTeamMembers: const [],//json['teamMembers'],
       isCompleted: false,
       progress: json['progressStatus'],
-      endDate: DateTime(2024, 4, 2),
+      endDate: json['deadlineDate'] ?? '${DateTime.now().toUtc().add(const Duration(days: 14)).toIso8601String().replaceFirst(RegExp(r'\.\d+'), '')}Z',
     );
   }
 

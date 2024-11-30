@@ -116,32 +116,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      top: 10,
-                      bottom: 10,
-                      right: 10,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Dark Theme",
-                          style: context.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 22,
-                          ),
-                        ),
-                        Switch(
-                          value: isDarkMode,
-                          onChanged: (value) {
-                            ref.read(themeProvider.notifier).toggleTheme();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+                  // TODO: Dark theme toggle
+                  // Padding(
+                  //   padding: const EdgeInsets.only(
+                  //     left: 16,
+                  //     top: 10,
+                  //     bottom: 10,
+                  //     right: 10,
+                  //   ),
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //     children: [
+                  //       Text(
+                  //         "Dark Theme",
+                  //         style: context.textTheme.headlineSmall?.copyWith(
+                  //           fontWeight: FontWeight.bold,
+                  //           fontSize: 22,
+                  //         ),
+                  //       ),
+                  //       Switch(
+                  //         value: isDarkMode,
+                  //         onChanged: (value) {
+                  //           ref.read(themeProvider.notifier).toggleTheme();
+                  //         },
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                   InkWell(
                     onTap: () {
                       ref.read(authProvider.notifier).logout();

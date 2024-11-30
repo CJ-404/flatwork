@@ -44,9 +44,120 @@ class NotificationTile extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   InkWell(
-                    onTap: () {
-                      //open overlay
-                      _showNotificationDetailsOverlay(context, ref);
+                    onTap: () async {
+                      try{
+                        //open overlay
+                        final result = await _showNotificationDetailsOverlay(context, ref);
+                        if(result == "accept")
+                          {
+                            ref.read(loadingProvider.notifier).state = true;
+                            final result = await ApiServices().acceptInvitation(id);
+                            ref.read(loadingProvider.notifier).state = false;
+                            if(result)
+                            {
+                              ref.invalidate(userCalendarTasksProvider);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    // mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text("Invitation accepted"),
+                                      SizedBox(width: 10),
+                                      Icon(Icons.check_box_outlined, color: Colors.black54),
+                                    ],
+                                  ),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              ref.read(projectIdProvider.notifier).state = projectId;
+                              await AuthServices().setProjectRole(role);
+                              ref.invalidate(invitationProvider);
+                              context.pushNamed(
+                                RouteLocation.viewProject,
+                                pathParameters: {'projectId': projectId},
+                              );
+                            }
+                            else{
+                              ref.invalidate(invitationProvider);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    // mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text("Check your network connection"),
+                                      SizedBox(width: 10),
+                                      Icon(Icons.error_outline_rounded, color: Colors.black54),
+                                    ],
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        else if(result == "reject")
+                          {
+                            ref.read(loadingProvider.notifier).state = true;
+                            try{
+                              await ApiServices().rejectInvitation(id);
+                              ref.read(loadingProvider.notifier).state = false;
+                              ref.invalidate(invitationProvider);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    // mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text("Invitation rejected"),
+                                      SizedBox(width: 10),
+                                      Icon(Icons.check_box_outlined, color: Colors.black54),
+                                    ],
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                            catch(e)
+                            {
+                              ref.read(loadingProvider.notifier).state = false;
+                              print(e.toString());
+                              ref.invalidate(invitationProvider);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    // mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text("Internal server error"),
+                                      SizedBox(width: 10),
+                                      Icon(Icons.error_outline_rounded, color: Colors.black54),
+                                    ],
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                      } catch (e)
+                      {
+                        ref.read(loadingProvider.notifier).state = false;
+                        print(e.toString());
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              // mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text("internal server error!"),
+                                SizedBox(width: 10),
+                                Icon(Icons.error_outline_rounded, color: Colors.black54),
+                              ],
+                            ),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
                     },
                     child: Text(
                       message.length< 30? message : "${message.substring(0,30)}...",
@@ -69,9 +180,10 @@ class NotificationTile extends ConsumerWidget {
     );
   }
 
-  void _showNotificationDetailsOverlay(BuildContext context, WidgetRef ref) {
+  Future<dynamic> _showNotificationDetailsOverlay(BuildContext context, WidgetRef ref) {
+    var loading = false;
 
-    showDialog(
+    return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -105,51 +217,31 @@ class NotificationTile extends ConsumerWidget {
                   //   alignment: Alignment.centerRight,
                   //     child: Text("2024.10.12 : 12.34", style: Theme.of(context).textTheme.bodySmall,)),
                   const SizedBox(height: 16),
+                  loading? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                      :
+                      SizedBox.shrink(),
                 ],
               ),
             ),
           ),
-          actions: [
+          actions:
+          loading?
+          []
+          :
+          [
             TextButton(
               onPressed: () async
               {
-                // TODO: Loading
-                try{
-                  final result = await ApiServices().acceptInvitation(id);
-                  if(result)
-                    {
-                      Navigator.pop(context);
-                      ref.read(projectIdProvider.notifier).state = projectId;
-                      await AuthServices().setProjectRole(role);
-                      ref.invalidate(invitationProvider);
-                      context.pushNamed(
-                        RouteLocation.viewProject,
-                        pathParameters: {'projectId': projectId},
-                      );
-                    }
-                  else{
-                    print("backend crashed : 405");
-                  }
-                } catch (e)
-                {
-                  print(e.toString());
-                }
+                Navigator.pop(context,"accept");
+
               },
               child: const Text('Accept'),
             ),
             TextButton(
-              // TODO: Loading
               onPressed: () async {
-                try{
-                  await ApiServices().rejectInvitation(id);
-                  ref.invalidate(invitationProvider);
-                  Navigator.pop(context);
-                }
-                catch(e)
-                {
-                  print(e.toString());
-                  Navigator.pop(context);
-                }
+                Navigator.pop(context,"reject");
               },
         child: const Text('Reject'),
             ),

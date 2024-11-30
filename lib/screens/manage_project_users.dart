@@ -39,6 +39,7 @@ class ManageProjectUsers extends ConsumerWidget {
     final deviceSize = context.deviceSize;
     // final projectIdState = ref.watch(projectIdProvider);
     final projectUsers2 = ref.watch(projectUserListProvider);
+    final loading = ref.watch(loadingProvider);
     final projectState = ref.watch(projectProvider);
     final tasksState = ref.watch(tasksProvider);
     final currentUserData = ref.watch(userDataProvider);
@@ -51,16 +52,75 @@ class ManageProjectUsers extends ConsumerWidget {
       :
       FloatingActionButton(
         onPressed: () async {
+          final currentUserData = ref.watch(userDataProvider);
           // Implement your function to write a message to a new user
-          // TODO: dialog to select a new user to add to the project
-          showOverlayDialog(context,ref, projectUsers2);
-          // await showModalBottomSheet(
-          //   // showDragHandle: true,
-          //   context: context,
-          //   builder: (ctx) {
-          //     return SelectTeamMember(assignedMembers: [] ,scaffoldKey: scaffoldKey,);
-          //   },
-          // );
+          try{
+            final User? user = await showOverlayDialog(context,ref, projectUsers2);
+            if(user != null && user.id.isNotEmpty)
+              {
+                ref.read(loadingProvider.notifier).state = true;
+                try{
+                  final result = await ApiServices().sendInvitation(user.id, projectId, currentUserData.value!["userId"]!, 2);
+                  ref.read(loadingProvider.notifier).state = false;
+                  if(result)
+                  {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          // mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text("Invitation sent"),
+                            SizedBox(width: 10),
+                            Icon(Icons.check_box_outlined, color: Colors.black54),
+                          ],
+                        ),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                  else
+                  {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          // mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text("Check your network connection"),
+                            SizedBox(width: 10),
+                            Icon( Icons.error_outline_rounded , color: Colors.black54),
+                          ],
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+                catch(e) {
+                  ref.read(loadingProvider.notifier).state = false;
+                  print(e);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        // mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("Internal server error"),
+                          SizedBox(width: 10),
+                          Icon( Icons.error_outline_rounded , color: Colors.black54),
+                        ],
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+          }
+          catch(e)
+          {
+            print(e.toString());
+          }
         },
         backgroundColor: colors.secondary, // Set the background color of the button
         child: const Icon(
@@ -181,6 +241,11 @@ class ManageProjectUsers extends ConsumerWidget {
                               height: deviceSize.height * 0.56,
                               color: context.colorScheme.onPrimary,
                               child:
+                                  loading?
+                                      Center(
+                                        child: CircularProgressIndicator(),
+                                      )
+                                  :
                               ListView.separated(
                                 shrinkWrap: true,
                                 itemCount: projectUsers2.length,
@@ -244,12 +309,11 @@ class ManageProjectUsers extends ConsumerWidget {
     );
   }
 
-  void showOverlayDialog(BuildContext context, WidgetRef ref, List<User> projectUsers) async {
+  Future<dynamic> showOverlayDialog(BuildContext context, WidgetRef ref, List<User> projectUsers) async {
     final deviceSize = context.deviceSize;
     TextEditingController searchController = TextEditingController();
-    final currentUserData = ref.watch(userDataProvider);
 
-    showDialog(
+    return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -310,15 +374,7 @@ class ManageProjectUsers extends ConsumerWidget {
                                 ],
                               ),
                               onTap: () async {
-                                // TODO: snack bar
-                                try{
-                                  final result = await ApiServices().sendInvitation(user.id, projectId, currentUserData.value!["userId"]!, 2);
-                                  (result)? Navigator.pop(context) : Navigator.pop(context);
-                                }
-                                catch(e) {
-                                  print(e);
-                                  Navigator.pop(context);
-                                }
+                                Navigator.pop(context,user);
                               },
                               enabled: !projectUsers.any((projectUser) => projectUser.id == user.id),
                             );
@@ -345,15 +401,62 @@ class ManageProjectUsers extends ConsumerWidget {
   }
 
   Widget dotThree(BuildContext context, WidgetRef ref, String projectId , String userId, String userRole) {
+    final currentUserData = ref.watch(userDataProvider);
+
       return PopupMenuButton<String>(
         icon: const Icon(
           Icons.more_vert,
           color: Colors.black,
           size: 28,
         ),
-        onSelected: (value) {
+        onSelected: (value) async {
           if (value == 'delete') {
-            showDeleteOverlayDialog(context, ref, projectId, userId);
+            try{
+              final result = await showDeleteOverlayDialog(context, ref, projectId, userId);
+              if(result == "remove")
+                {
+                  final remove = await ApiServices().removeUserFromProject(projectId, currentUserData.value!["userId"]!, userId);
+                  if(remove)
+                    {
+                      ref.invalidate(AllUserListProvider);
+                      ref.invalidate(projectUserListProvider);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text("User removed"),
+                              SizedBox(width: 10),
+                              Icon( Icons.check_box_outlined , color: Colors.black54),
+                            ],
+                          ),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  else{
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          // mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text("Internal server error"),
+                            SizedBox(width: 10),
+                            Icon( Icons.error_outline_rounded , color: Colors.black54),
+                          ],
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+            }
+            catch(e)
+          {
+            print(e.toString());
+          }
           } else if (value == 'change role') {
             showRoleChangeOverlayDialog(context, ref, projectId, userId, userRole);
           }
@@ -423,21 +526,56 @@ class ManageProjectUsers extends ConsumerWidget {
             TextButton(
               onPressed: () async {
                 try{
+                  Navigator.pop(context);
+                  ref.read(loadingProvider.notifier).state = true;
                   final role = _roleController.text == "Manager"? 1 : 2;
                   final ownerId = await AuthServices().getSavedUserId();
                   final result = await ApiServices().updateUserRole(ownerId, userId, projectId, role);
+                  ref.read(loadingProvider.notifier).state = false;
                   if(result)
                     {
                       ref.invalidate(AllUserListProvider);
                       ref.invalidate(projectUserListProvider);
-                      Navigator.pop(context);
                     }
                   else{
-                    print("Server error : 405");
+                    ref.invalidate(AllUserListProvider);
+                    ref.invalidate(projectUserListProvider);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          // mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text("Check your network connection"),
+                            SizedBox(width: 10),
+                            Icon( Icons.error_outline_rounded , color: Colors.black54),
+                          ],
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
                   }
                 } catch (e)
                 {
+                  Navigator.pop(context);
+                  ref.invalidate(AllUserListProvider);
+                  ref.invalidate(projectUserListProvider);
+                  ref.read(loadingProvider.notifier).state = false;
                   print(e.toString());
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        // mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(e.toString()?? "Internal server error"),
+                          SizedBox(width: 10),
+                          Icon( Icons.error_outline_rounded , color: Colors.black54),
+                        ],
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
                 }
               },
               child: const Text('Save'),
@@ -448,11 +586,11 @@ class ManageProjectUsers extends ConsumerWidget {
     );
   }
 
-  void showDeleteOverlayDialog(
+  Future<dynamic> showDeleteOverlayDialog(
       BuildContext context, WidgetRef ref, String projectId, String userId) {
     const String dummyUserName = 'John Doe'; // Replace with actual user name if available.
 
-    showDialog(
+    return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -460,13 +598,12 @@ class ManageProjectUsers extends ConsumerWidget {
           content: Text('Are you sure you want to remove $dummyUserName from the project?'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(context, "cancel"),
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                // TODO: Add delete logic here.
-                Navigator.pop(context);
+                Navigator.pop(context, 'remove');
               },
               child: const Text('Remove'),
             ),

@@ -49,6 +49,7 @@ class ProgressBarWithLabels extends ConsumerWidget {
                         .read(taskProgressProvider.notifier)
                         .state = value;
                     ref.invalidate(taskProvider);
+                    ref.invalidate(tasksProvider);
                     ref.invalidate(projectProvider);
                     print("updated progress!");
                   }
@@ -65,19 +66,24 @@ class ProgressBarWithLabels extends ConsumerWidget {
               children: predefinedPoints.map((point) {
                 return GestureDetector(
                   onTap: () async {
-                    // Update the progress value to a predefined point
-                    try{
-                      print("new progress updated: $point");
-                      final result = await ApiServices().updateTaskProgress(taskId, point);
-                      ref.read(taskProgressProvider.notifier).state = point;
-                      ref.invalidate(tasksProvider);
-                      ref.invalidate(projectProvider);
-                      print("updated progress!");
-                    }
-                    catch (e){
-                      //failed
-                      print("updated progress failed: $e");
-                    }
+                    if(editAccess)
+                      {
+                        ref.invalidate(userCalendarTasksProvider);
+                        // Update the progress value to a predefined point
+                        try{
+                          print("new progress updated: $point");
+                          final result = await ApiServices().updateTaskProgress(taskId, point);
+                          ref.read(taskProgressProvider.notifier).state = point;
+                          ref.invalidate(taskProvider);
+                          ref.invalidate(tasksProvider);
+                          ref.invalidate(projectProvider);
+                          print("updated progress!");
+                        }
+                        catch (e){
+                          //failed
+                          print("updated progress failed: $e");
+                        }
+                      }
                   },
                   child: Text(
                     '${point.toStringAsFixed(0)}%',

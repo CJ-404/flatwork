@@ -51,6 +51,7 @@ class ApiServices{
     );
     if (response.statusCode == 200){
       final result = jsonDecode(response.body)['data'];
+      print(result);
       return Project.projectFromJson(result);
     }
     else {
@@ -89,6 +90,7 @@ class ApiServices{
     );
     if (response.statusCode == 200){
       final List result = jsonDecode(response.body)['data'];
+      print(result);
       return result.map(((e) => Task.fromJson(e))).toList();
     }
     else {
@@ -146,6 +148,7 @@ class ApiServices{
     );
     if (response.statusCode == 200){
       final result = jsonDecode(response.body)['data'];
+      print(Task.fromJson(result));
       return Task.fromJson(result);
     }
     else {
@@ -311,6 +314,10 @@ class ApiServices{
       "task_name":task.title,
       "task_description":task.description,
       "project_id":projectId,
+      "deadlineDate": (task.endDate) != null?
+          task.endDate
+            :
+          '${DateTime.now().toUtc().add(const Duration(days: 14)).toIso8601String().replaceFirst(RegExp(r'\.\d+'), '')}Z',
     });
     Response response = await post(
         url,
@@ -382,7 +389,7 @@ class ApiServices{
   }
 
   Future<bool> removeUserFromProject(String projectId, String managerId, String userId) async {
-    final url = Uri.parse("$endpoint/user/invite_to_member");
+    final url = Uri.parse("$endpoint/project/remove_user_from_project");
     final body =  jsonEncode({
       "projectID": projectId,
       "managerID": managerId,

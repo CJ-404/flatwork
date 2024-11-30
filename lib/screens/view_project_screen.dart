@@ -334,23 +334,41 @@ class ViewProjectScreen extends ConsumerWidget {
                           // send link to the backend
                           // if not created, exception will pop
                           final created = await ApiServices().createProjectFile(projectId, pickedFile.files.first.name, uploadedUrl);
-                          // TODO: refresh getting shared files ref
                           // for now just pop from context to load again by taping
                           ref.read(loadingProvider.notifier).state = false;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                // mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text("file uploaded!"),
-                                  SizedBox(width: 10),
-                                  Icon(Icons.check_box_outlined, color: Colors.black54),
-                                ],
+                          if(created)
+                            {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    // mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text("file uploaded!"),
+                                      SizedBox(width: 10),
+                                      Icon(Icons.check_box_outlined, color: Colors.black54),
+                                    ],
+                                  ),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                          else{
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  // mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text("Please check your network connection"),
+                                    SizedBox(width: 10),
+                                    Icon( Icons.error_outline_rounded , color: Colors.black54),
+                                  ],
+                                ),
+                                backgroundColor: Colors.red,
                               ),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
+                            );
+                          }
                         }
                         catch (e){
                           print('error: $e');
@@ -361,7 +379,7 @@ class ViewProjectScreen extends ConsumerWidget {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 // mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text("file not uploaded! error occurred"),
+                                  Text("file not uploaded! try again later"),
                                   SizedBox(width: 10),
                                   Icon( Icons.error_outline_rounded , color: Colors.black54),
                                 ],
@@ -473,7 +491,7 @@ class ViewProjectScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             // mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Check your connection!"),
+              Text("Check your network connection"),
               SizedBox(width: 10),
               Icon( Icons.error_outline_rounded , color: Colors.black54),
             ],

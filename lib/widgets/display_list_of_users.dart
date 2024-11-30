@@ -144,7 +144,7 @@ class DisplayListOfUsers extends ConsumerWidget {
               // mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  errorMessage,
+                  errorMessage?? "Internal server error!",
                   style: const TextStyle(
                       fontSize: 8
                   ),
